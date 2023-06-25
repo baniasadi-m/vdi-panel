@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load jalali_tags %}
+
+{% block contentwraper %}
+<h1 class="m-0 text-dark">لیست گواهی</h1>
+{% endblock%}
+
+{% block maincontent %}
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">نام گواهی</th>
+        <th scope="col">نام (تحویل گیرنده)</th>
+        <th scope="col">نام خانوادگی (تحویل گیرنده)</th>
+        <th scope="col">شماره نامه </th>
+        <th scope="col">سامانه</th>
+        <th scope="col">فایل</th>
+        <th scope="col">فایل پسورد</th>
+        <th scope="col">فعال</th>
+        <th scope="col">ایجاد کننده </th>
+        <th scope="col">تاریخ ایجاد</th>
+        <th scope="col">تاریخ انقضا</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cert in certs%}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td><a href="{% url 'creatorapp:certinfo' info_id=cert.cert_user_national_id %}">{{ cert.cert_user_national_id }}</a></td>
+        <td>{{ cert.cert_user_name }}</td>
+        <td>{{ cert.cert_user_family }}</td>
+        <td>{{ cert.cert_letter_number }}</td>
+        <td>{{ cert.cert_id }}</td>
+        <td> <a href="{% get_media_prefix %}{{cert.cert_file}}">دانلود</a> </td>
+        <td> <a href="{% get_media_prefix %}{{cert.cert_password_file}}">دانلود</a> </td>
+        <td>
+          {%if cert.cert_is_activate %}
+               <img src="{% static 'assets/img/icon-yes.svg' %}" alt="{{ cert.cert_is_activate }}">
+          {%else%}
+               <img src="{% static 'assets/img/icon-no.svg' %}" alt="{{ cert.cert_is_activate }}">
+          {%endif%}
+        </td>
+        <td>{{ cert.cert_created_by }}</td>
+        <td>{{ cert.cert_created_at|to_jalali:'%Y/%m/%d' }}</td>
+        <td>{{ cert.cert_expired_at|to_jalali:'%Y/%m/%d'}}</td>
+        
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="text-xs-center">
+<nav aria-label="Page navigation example">
+<!-- 
+      <span class="current">
+        Page {{ certs.number }} of {{ certs.paginator.num_pages }}.
+      </span> -->
+
+   <ul class="pagination justify-content-center">
+      <li class="page-item">
+          {% if certs.has_previous %}
+          <a class="page-link" aria-label="Previous" href="?page={{ certs.previous_page_number }}">previous</a>
+          {% endif %}
+          <span class="sr-only">Previous</span>
+        
+      </li>
+      {% for i in certs.paginator.page_range%}
+          {%if certs.number == i %}
+          <li class="page-item active"><a class="page-link " href="?page={{i}}">{{i}}</a></li>
+          {%else%}
+          <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+          {%endif%}
+      {%endfor%}
+      <li class="page-item">
+          {% if certs.has_next %}
+          <a class="page-link" aria-label="Next" href="?page={{ certs.next_page_number }}">next</a>
+          {% endif %}
+          <span class="sr-only">Next</span>
+       
+      </li>
+    </ul> 
+</nav>
+</div>
+{% endblock %}

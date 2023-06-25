@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load jalali_tags %}
+
+{% block contentwraper %}
+<h1 class="m-0 text-dark">ابطال گواهی</h1>
+{% endblock%}
+
+{% block maincontent %}
+<div class="conter-wraper">
+
+{% if messages %}
+  <div class="row">
+  <div class="col-sm-6 col-sm-offset-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="True">&times;</span>
+        </button>
+          <h1 ><p style="color: blue">{{ message }}</p></h1>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+  <h1 name="national_id">شماره ملی:{{cert.cert_user_national_id }}</h1>
+  <hr>
+  <h1>نام:{{cert.cert_user_name}}</h1>
+  <h1>نام خانوادگی:{{cert.cert_user_family }}</h1>
+
+  <h1>شماره نامه:{{cert.cert_letter_number }}</h1>
+  <h1>تلفن تماس:{{cert.cert_user_phone}}</h1>
+  <h1>توضیحات:{{cert.cert_description }}</h1>
+  <h1>تاریخ ایجاد:{{cert.cert_created_at|to_jalali:'%Y/%m/%d'}}</h1>
+  <h1>تاریخ انقضا:{{cert.cert_expired_at|to_jalali:'%Y/%m/%d'}}</h1>
+  <h1>تاریخ ابطال:{{cert.cert_revoked_at|to_jalali:'%Y/%m/%d'}}</h1>
+
+
+</div>
+{% endblock %}

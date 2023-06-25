@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block maincontent %}
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+{% if messages %}
+  <div class="row">
+  <div class="col-sm-6 col-sm-offset-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="True">&times;</span>
+        </button>
+          <h1 ><p style="color: blue">{{ message }}</p></h1>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+        
+        <!-- /.row -->
+        <!-- Main row -->
+   <!-- Small boxes (Stat box) -->
+<div class="row">
+  <div class="col-lg-3 col-6">
+    <!-- small box -->
+    <div class="small-box bg-info">
+      <div class="inner">
+        <h3>{{today_created}}</h3>
+
+        <p>ایجاد شده(۲۴ ساعت گذشته)</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-bag"></i>
+      </div>
+      <!-- <a href="#" class="small-box-footer">بیشتر<i class="fas fa-arrow-circle-right"></i></a> -->
+    </div>
+  </div>
+  <!-- ./col -->
+  <div class="col-lg-3 col-6">
+    <!-- small box -->
+    <div class="small-box bg-success">
+      <div class="inner">
+        <h3>{{activated}}</h3>
+
+        <p>فعال</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-stats-bars"></i>
+      </div>
+      <!-- <a href="#" class="small-box-footer">بیشتر <i class="fas fa-arrow-circle-right"></i></a> -->
+    </div>
+  </div>
+  <!-- ./col -->
+  <div class="col-lg-3 col-6">
+    <!-- small box -->
+    <div class="small-box bg-warning">
+      <div class="inner">
+        <h3>{{expiring}}</h3>
+
+        <p>در حال انقضا</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-person-add"></i>
+      </div>
+      <!-- <a href="#" class="small-box-footer">بیشتر<i class="fas fa-arrow-circle-right"></i></a> -->
+    </div>
+  </div>
+  <!-- ./col -->
+  <div class="col-lg-3 col-6">
+    <!-- small box -->
+    <div class="small-box bg-danger">
+      <div class="inner">
+        <h3>{{expired}}</h3>
+
+        <p>منقضی</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-pie-graph"></i>
+      </div>
+      <!-- <a href="#" class="small-box-footer">بیشتر<i class="fas fa-arrow-circle-right"></i></a> -->
+    </div>
+  </div>
+  <!-- ./col -->
+</div>
+<div class="row mb-6">
+
+  <div class="col-lg-8 col-sm-12 m-auto">
+    <div class="card card-info">
+       <div class="card-header">
+          <h3 class="card-title mb-0" style="float: right;">گزارش  </h3>
+       </div>
+       <div class="card-body">
+          <table class="table table-bordered" style="text-align: center;">
+             <thead>
+                <tr>
+                   
+                   <th colspan="1">تعداد میزکار ایجاد شده (ماه جاری)</th>
+                   
+                   <th colspan="1">انواع گواهی</th>
+                   <th colspan="1">تعداد کاربران آنلاین</th>
+                </tr>
+             </thead>
+             <tbody>
+                <tr>
+                   <td>{{monthly_created}}</td>
+                   
+                   <td>{{type_counts}}</td>
+                   
+                   <td>{{online_users}}</td>
+                </tr>
+
+             </tbody>
+          </table>
+       </div>
+    </div>
+    <hr>
+ </div>
+ 
+
+      
+</div>
+
+{% endblock %}

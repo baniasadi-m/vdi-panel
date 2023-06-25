@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load jalali_tags %}
+
+{% block contentwraper %}
+<h1 class="m-0 text-dark">جستجو</h1>
+{% endblock%}
+
+{% block maincontent %}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+     <thead>
+       <tr>
+         <th scope="col">#</th>
+         <th scope="col">نام (تحویل گیرنده)</th>
+         <th scope="col">نام خانوادگی (تحویل گیرنده)</th>
+         <th scope="col">نام گواهی</th>
+         <th scope="col">شماره نامه </th>
+         <th scope="col">سامانه</th>
+         <th scope="col">تاریخ ایجاد</th>
+         <th scope="col">تاریخ انقضا</th>
+       </tr>
+     </thead>
+     <tbody>
+        {% for cert in certs%}
+        <tr>
+         <th scope="row">{{ forloop.counter }}</th>
+         <td>{{ cert.cert_user_name }}</td>
+         <td>{{ cert.cert_user_family }}</td>
+         <td>{{ cert.cert_user_national_id }}</td>
+         <td>{{ cert.cert_letter_number }}</td>
+         <td>{{ cert.cert_id }}</td>
+         <td>{{ cert.cert_created_at|to_jalali:'%Y/%m/%d' }}</td>
+         <td>{{ cert.cert_expired_at|to_jalali:'%Y/%m/%d'}}</td>
+       </tr>
+       {% endfor %}
+     </tbody>
+   </table>
+   </div>
+
+{% endblock %}
