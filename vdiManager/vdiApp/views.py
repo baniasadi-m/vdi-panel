@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect,HttpResponse
 from .models import VirtualDesktop,VDIServer
+from .forms import CreateVirtualDesktop
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required,permission_required
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger,InvalidPage
@@ -24,6 +25,12 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+def user_allowed(request,usergroup=[]):
+    for g in usergroup:
+        if request.user.groups.filter(name=f"{g}").exists():
+            return True
+
+    return False
 
 # Main Dashboard
 @login_required(login_url='/accounts/login/')
@@ -54,13 +61,86 @@ def dashboard(request):
     }
     return render(request, 'vdiApp/dashboard.html',context=context)
 
+# Creating vdi container
+@login_required(login_url='/accounts/login/')
+def vdcreate(request):
+    if user_allowed(request,usergroup=['vdadmin']):
+        if request.method == 'POST':
+            form=CreateVirtualDesktop(request.POST)
+            if form.is_valid():
+                temp_form = form.save(commit=False)
+                temp_form.vd_container_cpu = request.POST['vd_container_cpu']
+                temp_form.vd_container_mem = request.POST['vd_container_mem']
+                url = f"{temp_form.vd_server.server_scheme}://{temp_form.vd_server.server_ip}:{temp_form.vd_server.server_port}/api/v1/containers"
+                headers={'Content-Type': 'application/json'}
+                data = {
+                        'image': 'dorowu/ubuntu-desktop-lxde-vnc',
+                        'name' : f"{temp_form.vd_container_name}",
+                        'cpu' : f"{temp_form.vd_container_cpu}",
+                        'mem' : f"{temp_form.vd_container_mem}",
+                        'volumes' : {f"{temp_form.vd_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/home/{temp_form.vd_container_user}/Downloads", 'mode': 'rw'}},
+                        'env' : {"USER":f"{temp_form.vd_container_user}","PASSWORD":f"{temp_form.vd_container_password}","VNC_PASSWORD":f"{temp_form.vd_container_vncpass}"},
+                        'ports' : {'80/tcp':int(f"{temp_form.vd_port}")},
+                        }
+                print(data)
+                import requests, json
+                try:
+                    r = requests.post(url=url,data=json.dumps(data),headers=headers,verify=False).json()
+                    # r={'status':'1','container_spec':{'id':"dfcddevfervervvr",'short_id':"fvdfdre"}}
+                    print(r)
+                    if int(r['status']) == 1:
+                        temp_form.vd_container_id = r['container_spec']['id']
+                        temp_form.vd_container_shortid = r['container_spec']['short_id']
+                        temp_form.vd_created_by = str(request.user)
+                        temp_form.save()
+                        messages.add_message(request,messages.INFO,'میزکار ایجاد شد')
+                        return redirect('/')
+                except Exception as e:
+                    print(e)
+                    messages.add_message(request,messages.ERROR,'API error')
+                    return redirect('/vdcreate')
+
+        form=CreateVirtualDesktop()
+        username =request.user.get_user_permissions()
+        x=request.user.groups.get(name='vdadmin')
+        v=""
+        print(v)
+        return render(request, 'vdiApp/vdcreate.html',{'form':form,'v':v,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"})
+    return HttpResponse("vdcreate Permission Denied")
+
+
+
+
+# Remove vdi container
+@login_required(login_url='/accounts/login/')
+def vdremove(request,vd_id):
+    return HttpResponse(f"vdremove {vd_id}")
+
+
+
+# list vdi container
+@login_required(login_url='/accounts/login/')
+def vdlist(request):
+    return HttpResponse("vdlist")
+
+
+# Showing cert full info
+@login_required(login_url='/accounts/login/')
+def vdinfo(request,info_id):
+    vd = VirtualDesktop.objects.get(vd_container_name=info_id)
+    print(vd)
+    context = {'myvd':vd,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+    return render(request, 'vdiApp/vdinfo.html',context=context)
+
+
+
 # Showing searched certs
 @login_required(login_url='/accounts/login/')
 def search(request):
-    search_cert = request.GET.get('q')
-    if search_cert:
-        certs = VirtualDesktop.objects.filter(Q(cert_user_national_id__icontains=search_cert) |Q(cert_user_family__icontains=search_cert) |Q(cert_letter_number__icontains=search_cert))
+    search_vd = request.GET.get('q')
+    if search_vd:
+        vds = VirtualDesktop.objects.filter(Q(vd_created_by__icontains=search_vd) |Q(vd_letter_number__icontains=search_vd) |Q(vd_owner__icontains=search_vd))
     else:
-        certs = VirtualDesktop.objects.all().order_by("-vd_created_at")
-    context = {'certs': certs,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+        vds = VirtualDesktop.objects.all().order_by("-vd_created_at")
+    context = {'vds': vds,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
     return render(request, 'vdiApp/search.html',context=context)

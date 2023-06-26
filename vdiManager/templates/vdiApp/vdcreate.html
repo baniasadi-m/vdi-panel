@@ -3,7 +3,7 @@
 {% load bootstrap %}
 
 {% block contentwraper %}
-<h1 class="m-0 text-dark">ایجاد گواهی</h1>
+<h1 class="m-0 text-dark">ایجاد میزکار</h1>
 {% endblock%}
 
 {% block maincontent %}
@@ -27,7 +27,7 @@
       <div class="container-fluid">
 
 
-          <form action="{% url 'creatorapp:certcreate' %}" method="post">
+          <form action="{% url 'vdiApp:vdcreate' %}" method="post">
             {% csrf_token %}
             
             <div class="row ">
@@ -35,7 +35,7 @@
             </div> 
     <p>{{v}}</p>
     <!-- Submit button -->
-    <button type="submit" class="btn btn-primary btn-block mb-4">ایجاد گواهی</button>
+    <button type="submit" class="btn btn-primary btn-block mb-4">ایجاد میزکار</button>
   </form>
 
   

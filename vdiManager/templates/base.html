@@ -39,17 +39,14 @@
       <li class="nav-item d-none d-sm-inline-block">
         <a href="/" class="nav-link">داشبورد</a>
       </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">کاربران</a>
-      </li>
     </ul>
-    <!-- <form action="{% url 'vdiApp:search' %}" method="GET" class="form-inline ml-3">
+    <form action="{% url 'vdiApp:search' %}" method="GET" class="form-inline ml-3">
       <div class="input-group input-group-sm">
         <input class="form-control form-control-navbar" id="id_q" type="text" placeholder="جستجو" aria-label="Search" name="q" value="">
       </div>
       
 
-    </form> -->
+    </form>
     <div>
       <span>ساعت : </span>
       <span style="color:#333333;direction:rtl;margin-right: 10px;" class="date-now">
@@ -128,20 +125,48 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="/vdicreate/" class="nav-link active">
+                  <a href="/vdcreate/" class="nav-link active">
                     <i class="fas fa-edit nav-icon"></i>
                     <p>ایجاد میزکار</p>
                   </a>
                   <li class="nav-item">
-                      <a href="/certlist/" class="nav-link active">
+                      <a href="/vdlist/" class="nav-link active">
                         <i class="fas fa-list nav-icon"></i>
-                        <p>لیست گواهی</p>
+                        <p>لیست میزکار</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a href="/certbatch/" class="nav-link active">
+                      <a href="/vdbatch/" class="nav-link active">
                         <i class="fas fa-list nav-icon"></i>
                         <p>ایجاد گروهی</p>
+                      </a>
+                    </li>
+                </li>
+              </ul>
+            </li>
+        </nav>
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Add icons to the links using the .nav-icon class
+                 with font-awesome or any other icon font library -->
+            <li class="nav-item has-treeview menu-open">
+              <a href="#" class="nav-link active">
+                <i class="nav-icon fas fa-list"></i>
+                <p>
+                سرورها
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="/servercreate/" class="nav-link active">
+                    <i class="fas fa-edit nav-icon"></i>
+                    <p>ایجاد سرور</p>
+                  </a>
+                  <li class="nav-item">
+                      <a href="/serverlist/" class="nav-link active">
+                        <i class="fas fa-list nav-icon"></i>
+                        <p>لیست سرورها</p>
                       </a>
                     </li>
                 </li>
