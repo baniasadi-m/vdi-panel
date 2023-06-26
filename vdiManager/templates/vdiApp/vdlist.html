@@ -18,6 +18,7 @@
         <th scope="col">سرور</th>
         <th scope="col">شماره نامه </th>
         <th scope="col">ایجاد کننده</th>
+        <th scope="col">آیپی ایجاد کننده</th>
         <th scope="col">فعال</th>
         <th scope="col">تاریخ ایجاد</th>
       </tr>
@@ -26,11 +27,12 @@
       {% for vd in vds%}
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
-        <td><a href="{% url 'vdiApp:vdinfo' info_id=vd.vd_container_name %}">{{ vd.vd_container_name }}</a></td>
+        <td><a href="{% url 'vdiApp:vdinfo' info_id=vd.vd_container_shortid %}">{{ vd.vd_container_name }}</a></td>
         <td>{{ vd.vd_owner }}</td>
         <td>{{ vd.vd_server }}</td>
         <td>{{ vd.vd_letter_number }}</td>
         <td>{{ vd.vd_created_by}}</td>
+        <td>{{ vd.vd_creator_ip}}</td>
         <td>
           {%if vd.vd_is_activate %}
                <img src="{% static 'assets/img/icon-yes.svg' %}" alt="{{ cert.cert_is_activate }}">

@@ -26,7 +26,7 @@
       {% for vd in vds%}
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
-        <td><a href="{% url 'vdiApp:vdinfo' info_id=vd.vd_container_name %}">{{ vd.vd_container_name }}</a></td>
+        <td><a href="{% url 'vdiApp:vdinfo' info_id=vd.vd_container_shortid %}">{{ vd.vd_container_name }}</a></td>
         <td>{{ vd.vd_owner }}</td>
         <td>{{ vd.vd_server }}</td>
         <td>{{ vd.vd_letter_number }}</td>

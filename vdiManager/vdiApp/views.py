@@ -44,14 +44,14 @@ def dashboard(request):
     expired = VirtualDesktop.objects.filter(vd_expired_at__lt=datetime.now()).count()
     last_7_days = today_obj + timedelta(days=-7)
     expiring = VirtualDesktop.objects.filter(Q(vd_expired_at__gt=datetime.date(last_7_days)) & Q(vd_expired_at__lt=datetime.date(today_obj))).count()
-    cert_activate = VirtualDesktop.objects.filter(vd_is_activate=True).count()
+    vd_activate = VirtualDesktop.objects.filter(vd_is_activate=True).count()
     online_users = OnlineUserActivity.get_user_activities(timedelta(minutes=1)).count()
 
     type_counts = VDIServer.objects.all().count()
     context = {
         'online_users':online_users,
         'expired': expired,
-        'activated':cert_activate,
+        'activated':vd_activate,
         'expiring': expiring,
         'today_created':today_created,
         'monthly_created': monthly_created,
@@ -71,10 +71,11 @@ def vdcreate(request):
                 temp_form = form.save(commit=False)
                 temp_form.vd_container_cpu = request.POST['vd_container_cpu']
                 temp_form.vd_container_mem = request.POST['vd_container_mem']
+                temp_form.vd_container_img = 'dorowu/ubuntu-desktop-lxde-vnc'
                 url = f"{temp_form.vd_server.server_scheme}://{temp_form.vd_server.server_ip}:{temp_form.vd_server.server_port}/api/v1/containers"
                 headers={'Content-Type': 'application/json'}
                 data = {
-                        'image': 'dorowu/ubuntu-desktop-lxde-vnc',
+                        'image': f"{temp_form.vd_container_img}",
                         'name' : f"{temp_form.vd_container_name}",
                         'cpu' : f"{temp_form.vd_container_cpu}",
                         'mem' : f"{temp_form.vd_container_mem}",
@@ -92,8 +93,9 @@ def vdcreate(request):
                         temp_form.vd_container_id = r['container_spec']['id']
                         temp_form.vd_container_shortid = r['container_spec']['short_id']
                         temp_form.vd_created_by = str(request.user)
+                        temp_form.vd_creator_ip = get_client_ip(request)
                         temp_form.save()
-                        messages.add_message(request,messages.INFO,'میزکار ایجاد شد')
+                        messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
                         return redirect('/')
                 except Exception as e:
                     print(e)
@@ -114,20 +116,56 @@ def vdcreate(request):
 # Remove vdi container
 @login_required(login_url='/accounts/login/')
 def vdremove(request,vd_id):
-    return HttpResponse(f"vdremove {vd_id}")
+    vd = VirtualDesktop.objects.get(vd_container_id=vd_id)
+    print(vd)
+    import requests,json
+    url = f"{vd.vd_server.server_scheme}://{vd.vd_server.server_ip}:{vd.vd_server.server_port}/api/v1/containers/{vd.vd_container_id}"
+    try:
+        data = {'path':f"{vd.vd_server.data_path}/{vd.vd_container_name}"}
+        headers={'Content-Type': 'application/json'}
+        r = requests.delete(url=url,headers=headers,data=json.dumps(data),verify=False).json()
+        if int(r['status']) == 1:
+            messages.add_message(request,messages.SUCCESS,'میزکار با مشخصات ذیل حذف شد')
+            vd.vd_is_activate = False
+            vd.save()
+        else:
+            messages.add_message(request,messages.WARNING,'احتمالا قبلا حذف شده است')
+
+    except Exception as e:
+        print(e)
+        messages.add_message(request,messages.WARNING,'مشکلی در حذف رخ داده است')
+        return redirect('/')
+
+    context = {'myvd':vd,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+    return render(request, 'vdiApp/vdremove.html',context=context)
+  
 
 
 
 # list vdi container
 @login_required(login_url='/accounts/login/')
 def vdlist(request):
-    return HttpResponse("vdlist")
+    all_entries = VirtualDesktop.objects.all()
+    paginator = Paginator(all_entries,10)
+    page_number = request.GET.get('page')
+    try:
+        vds = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        vds = paginator.get_page(1)
+    except EmptyPage:
+        vds = paginator.get_page(1)
+    except InvalidPage:
+        vds = paginator.get_page(1)
+    context = {'vds': vds,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+    return render(request, 'vdiApp/vdlist.html',context=context)
+
+#  return HttpResponse("vdlist")
 
 
 # Showing cert full info
 @login_required(login_url='/accounts/login/')
 def vdinfo(request,info_id):
-    vd = VirtualDesktop.objects.get(vd_container_name=info_id)
+    vd = VirtualDesktop.objects.get(vd_container_shortid=info_id)
     print(vd)
     context = {'myvd':vd,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
     return render(request, 'vdiApp/vdinfo.html',context=context)
@@ -139,7 +177,7 @@ def vdinfo(request,info_id):
 def search(request):
     search_vd = request.GET.get('q')
     if search_vd:
-        vds = VirtualDesktop.objects.filter(Q(vd_created_by__icontains=search_vd) |Q(vd_letter_number__icontains=search_vd) |Q(vd_owner__icontains=search_vd))
+        vds = VirtualDesktop.objects.filter(Q(vd_created_by__icontains=search_vd) |Q(vd_letter_number__icontains=search_vd) |Q(vd_owner__icontains=search_vd) |Q(vd_container_name__icontains=search_vd))
     else:
         vds = VirtualDesktop.objects.all().order_by("-vd_created_at")
     context = {'vds': vds,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}

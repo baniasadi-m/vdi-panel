@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load jalali_tags %}
+
+{% block contentwraper %}
+<h1 class="m-0 text-dark">حذف میزکار</h1>
+{% endblock%}
+
+{% block maincontent %}
+<div class="conter-wraper">
+
+{% if messages %}
+  <div class="row">
+  <div class="col-sm-6 col-sm-offset-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="True">&times;</span>
+        </button>
+          <h1 ><p style="color: blue">{{ message }}</p></h1>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+<h1 name="national_id">نام میزکار:{{myvd.vd_container_name }}</h1>
+<hr>
+<h1>ایمیج:{{myvd.vd_container_img}}</h1>
+<h1>تحویل گیرنده:{{myvd.vd_owner }}</h1>
+<h1>شناسه کانتینر:{{myvd.vd_container_id }}</h1>
+<h1>ایجاد کننده:{{myvd.vd_created_by}}</h1>
+<h1>سرور: {{myvd.vd_server.server_name}} - {{myvd.vd_server.server_ip}}</h1>
+<h1>شماره نامه:{{myvd.vd_letter_number}}</h1>
+<h1>توضیحات:{{myvd.vd_description }}</h1>
+<h1>تاریخ ایجاد:{{myvd.vd_created_at|to_jalali:'%Y/%m/%d'}}</h1>
+<h1>تاریخ انقضا:{{myvd.vd_expired_at|to_jalali:'%Y/%m/%d'}}</h1>
+
+
+</div>
+{% endblock %}

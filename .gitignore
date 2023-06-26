@@ -1,5 +1,4 @@
 # Byte-compiled / optimized / DLL files
-vdiManager/vdiApp/migrations/*
 __pycache__/
 *.py[cod]
 *$py.class
