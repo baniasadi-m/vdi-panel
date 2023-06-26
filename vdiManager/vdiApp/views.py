@@ -172,7 +172,7 @@ def vdinfo(request,info_id):
 
 
 
-# Showing searched certs
+# Showing searched vds
 @login_required(login_url='/accounts/login/')
 def search(request):
     search_vd = request.GET.get('q')
@@ -182,3 +182,49 @@ def search(request):
         vds = VirtualDesktop.objects.all().order_by("-vd_created_at")
     context = {'vds': vds,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
     return render(request, 'vdiApp/search.html',context=context)
+
+# Showing list of servers
+@login_required(login_url='/accounts/login/')
+def serverlist(request):
+    all_entries = VDIServer.objects.all()
+    paginator = Paginator(all_entries,10)
+    page_number = request.GET.get('page')
+    try:
+        servers = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        servers = paginator.get_page(1)
+    except EmptyPage:
+        servers = paginator.get_page(1)
+    except InvalidPage:
+        servers = paginator.get_page(1)
+    context = {'servers': servers,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+    return render(request, 'vdiApp/serverlist.html',context=context)
+
+
+def server_status(server_url):
+    import requests
+    headers={'Content-Type': 'application/json'}
+    try:
+        r = requests.get(url=server_url,headers=headers,verify=False,timeout=2).json()
+        if int(r['status']) == 1:
+            return True
+    except Exception as e:
+        print(e)
+        return False
+
+# Showing server status and info
+@login_required(login_url='/accounts/login/')
+def server_info(request,info_id):
+    server = VDIServer.objects.get(server_name=info_id)
+    url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/load"
+    if server_status(server_url=url) == True:
+        messages.add_message(request,messages.SUCCESS,'VDI Agent Status is Running')
+    else:
+        messages.add_message(request,messages.WARNING,'VDI Agent Status is Unknown ')
+
+    context = {'server': server,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+    return render(request, 'vdiApp/serverinfo.html',context=context)
+
+
+
+    

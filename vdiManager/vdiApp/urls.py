@@ -8,5 +8,7 @@ urlpatterns = [
     path('vdcreate/',vdcreate , name='vdcreate'), 
     path('vdlist/',vdlist , name='vdlist'), 
     path('vdremove/<vd_id>',vdremove , name='vdremove'), 
-    path('vdinfo/<info_id>',vdinfo , name='vdinfo')
+    path('vdinfo/<info_id>',vdinfo , name='vdinfo'),
+    path('serverlist/',serverlist , name='serverlist'),
+    path('serverinfo/<info_id>',server_info , name='serverinfo'),
 ]
