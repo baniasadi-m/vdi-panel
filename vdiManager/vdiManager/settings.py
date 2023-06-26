@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'bootstrapform',
     'accounts',
     'online_users',
+    'rest_framework',
   
 ]
 

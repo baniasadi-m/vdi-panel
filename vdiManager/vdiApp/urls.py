@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
 
 app_name = 'vdiApp'
@@ -11,4 +11,5 @@ urlpatterns = [
     path('vdinfo/<info_id>',vdinfo , name='vdinfo'),
     path('serverlist/',serverlist , name='serverlist'),
     path('serverinfo/<info_id>',server_info , name='serverinfo'),
+    path('api/v1/',include('vdiApp.api.v1.urls')),
 ]
