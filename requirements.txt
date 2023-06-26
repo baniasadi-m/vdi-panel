@@ -1,12 +1,15 @@
 asgiref==3.7.2
 certifi==2023.5.7
 charset-normalizer==3.1.0
-Django==3.2
+Django >3.2,<3.3
 django-bootstrap-form==3.4
+django-filter==23.2
 django-jalali-date==1.0.1
 django-online-users==0.3
+djangorestframework==3.14.0
 idna==3.4
 jdatetime==4.1.1
+Markdown==3.4.3
 pytz==2023.3
 requests==2.31.0
 simplejson==3.17.6
