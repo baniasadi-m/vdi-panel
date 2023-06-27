@@ -3,7 +3,7 @@
 {% load jalali_tags %}
 
 {% block contentwraper %}
-<h1 class="m-0 text-dark">حذف میزکار</h1>
+<h1 class="m-0 text-dark"> میزکار</h1>
 {% endblock%}
 
 {% block maincontent %}
@@ -26,11 +26,16 @@
 {% endif %}
 <h1 name="national_id">نام میزکار:{{myvd.vd_container_name }}</h1>
 <hr>
-<h1>ایمیج:{{myvd.vd_container_img}}</h1>
-<h1>تحویل گیرنده:{{myvd.vd_owner }}</h1>
-<h1>شناسه کانتینر:{{myvd.vd_container_id }}</h1>
-<h1>ایجاد کننده:{{myvd.vd_created_by}}</h1>
-<h1>سرور: {{myvd.vd_server.server_name}} - {{myvd.vd_server.server_ip}}</h1>
+<h1>Image:{{myvd.vd_container_img}}</h1>
+<h1>Owner:{{myvd.vd_owner }}</h1>
+<h1>container id:{{myvd.vd_container_id }}</h1>
+<h1>creator by:{{myvd.vd_created_by}}</h1>
+<h1>server: {{myvd.vd_server.server_name}} - {{myvd.vd_server.server_ip}}</h1>
+<h1>port: {{myvd.vd_port}} </h1>
+<h1>browser port: {{myvd.vd_browser_port}} </h1>
+<h1>vnc pass: {{myvd.vd_container_vncpass}} </h1>
+<h1>user container: {{myvd.vd_container_user}} </h1>
+<h1>pass: {{myvd.vd_container_password}} </h1>
 <h1>شماره نامه:{{myvd.vd_letter_number}}</h1>
 <h1>توضیحات:{{myvd.vd_description }}</h1>
 <h1>تاریخ ایجاد:{{myvd.vd_created_at|to_jalali:'%Y/%m/%d'}}</h1>

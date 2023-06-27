@@ -10,6 +10,7 @@ import os
 from django.conf import settings
 from django.http import FileResponse
 from online_users.models import OnlineUserActivity
+from .config import Config
 
 
 from datetime import datetime
@@ -60,6 +61,28 @@ def dashboard(request):
         'current_ip':f"{get_client_ip(request)}",
     }
     return render(request, 'vdiApp/dashboard.html',context=context)
+##################################################    
+def get_server():
+    import requests,json
+    min_load = 500.00
+    servers = VDIServer.objects.all()
+    print(type(servers),servers)
+    headers={'Content-Type': 'application/json'}
+    url=""
+    final_server_id = ""
+    for server in servers:
+        print(server.id,type(server))
+        url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/load"
+        try:
+            result = requests.get(url=url,headers=headers,verify=False).json()
+            if float(result['load']) < min_load:
+                min_load = int(result['load'])
+                final_server_id = server.id
+        except Exception as e:
+            continue
+    final_server = VDIServer.objects.get(id=final_server_id)
+    print(final_server,final_server_id,min_load)
+    return final_server
 
 # Creating vdi container
 @login_required(login_url='/accounts/login/')
@@ -71,7 +94,10 @@ def vdcreate(request):
                 temp_form = form.save(commit=False)
                 temp_form.vd_container_cpu = request.POST['vd_container_cpu']
                 temp_form.vd_container_mem = request.POST['vd_container_mem']
-                temp_form.vd_container_img = 'dorowu/ubuntu-desktop-lxde-vnc'
+                temp_form.vd_container_img = Config.DOCKER_DESKTOP_IMAGE
+                server_elec = get_server()
+                temp_form.vd_server = server_elec
+                # temp_form.vd_server.server_ip = get_server()
                 url = f"{temp_form.vd_server.server_scheme}://{temp_form.vd_server.server_ip}:{temp_form.vd_server.server_port}/api/v1/containers"
                 headers={'Content-Type': 'application/json'}
                 data = {
@@ -81,22 +107,30 @@ def vdcreate(request):
                         'mem' : f"{temp_form.vd_container_mem}",
                         'volumes' : {f"{temp_form.vd_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/home/{temp_form.vd_container_user}/Downloads", 'mode': 'rw'}},
                         'env' : {"USER":f"{temp_form.vd_container_user}","PASSWORD":f"{temp_form.vd_container_password}","VNC_PASSWORD":f"{temp_form.vd_container_vncpass}"},
-                        'ports' : {'80/tcp':int(f"{temp_form.vd_port}")},
+                        'ports' : ['80'],
+                        # 'ports' : {'80/tcp':int(f"{temp_form.vd_port}")},
                         }
                 print(data)
                 import requests, json
                 try:
                     r = requests.post(url=url,data=json.dumps(data),headers=headers,verify=False).json()
+                    print(type(r),r)
+                    response_ports = json.loads(r['container_spec']['host_ports'])
+                    if len(response_ports) > 1:
+                        for i in response_ports:
+                            temp_form.vd_port += f",{str(i)}"
+                    else:
+                        temp_form.vd_port = response_ports[0]
+
                     # r={'status':'1','container_spec':{'id':"dfcddevfervervvr",'short_id':"fvdfdre"}}
-                    # print(r)
+                    
                     if int(r['status']) == 1:
                         temp_form.vd_container_id = r['container_spec']['id']
                         temp_form.vd_container_shortid = r['container_spec']['short_id']
                         temp_form.vd_created_by = str(request.user)
                         temp_form.vd_creator_ip = get_client_ip(request)
-                        temp_form.vd_browser_img = 'filebrowser/filebrowser'
-                        temp_form.vd_browser_port = '2323'
-                        temp_form.vd_browser_name = temp_form.vd_container_name + 'filebrowser'
+                        temp_form.vd_browser_img = Config.DOCKER_BROWSER_IMAGE 
+                        temp_form.vd_browser_name = temp_form.vd_container_name + '-filebrowser'
                         data = {
                                 'image': f"{temp_form.vd_browser_img}",
                                 'name' : f"{temp_form.vd_browser_name}",
@@ -104,16 +138,24 @@ def vdcreate(request):
                                 'mem' : "1g",
                                 'volumes' : {f"{temp_form.vd_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/srv", 'mode': 'ro'}},
                                 'env' : {"USER":"vdi"},
-                                'ports' : {'80/tcp':int(f"{temp_form.vd_browser_port}")},
+                                'ports' : ['80'],
+                                # 'ports' : {'80/tcp':int(f"{temp_form.vd_browser_port}")},
                                 }
                         r = requests.post(url=url,data=json.dumps(data),headers=headers,verify=False).json()
+                        print(r)
                         if int(r['status']) == 1:
                             temp_form.vd_browser_id = r['container_spec']['id']
+                            response_ports = json.loads(r['container_spec']['host_ports'])
+                            if len(response_ports) > 1:
+                                for i in response_ports:
+                                    temp_form.vd_browser_port += f",{str(i)}"
+                            else:
+                                temp_form.vd_browser_port = response_ports[0]
                             temp_form.save()
                             messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
-                            return redirect('/')
+                            return redirect(f"/vdinfo/{temp_form.vd_container_shortid}")
                         else:
-                            messages.add_message(request,messages.ERROR,'API error')
+                            messages.add_message(request,messages.ERROR,'API Status error')
                             return redirect('/vdcreate')
                 except Exception as e:
                     print(e)

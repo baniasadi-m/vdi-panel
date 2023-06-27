@@ -25,14 +25,14 @@ class VirtualDesktop(models.Model):
     class Meta:
         verbose_name=" میزکار "
         verbose_name_plural ="میزکار ها"
-    vd_container_name = models.CharField(blank=True, max_length=100,verbose_name="نام کانتینر")
+    vd_container_name = models.CharField(blank=True, max_length=100,verbose_name="نام میزکار")
     vd_container_cpu = models.CharField(blank=True, max_length=25,verbose_name="مقدار پردازنده")
     vd_container_mem = models.CharField(blank=True, max_length=25,verbose_name="مقدار حافظه")
     vd_container_img = models.CharField(blank=True, max_length=255,verbose_name=" ایمیج")
     vd_container_id = models.CharField(blank=True, max_length=255,verbose_name=" شناسه کانتینر")
     vd_container_shortid = models.CharField(blank=True, max_length=255,verbose_name=" شناسه کوتاه کانتینر")
-    vd_container_user = models.CharField(blank=True, max_length=25,verbose_name=" کاربر کانتینر")
-    vd_container_password = models.CharField(blank=True, max_length=25,verbose_name=" پسورد کانتینر")
+    vd_container_user = models.CharField(blank=True, max_length=25,verbose_name=" کاربری میزکار")
+    vd_container_password = models.CharField(blank=True, max_length=25,verbose_name=" پسورد میزکار")
     vd_container_vncpass = models.CharField(blank=True, max_length=25,verbose_name=" پسوردvnc")
     vd_browser_id = models.CharField(blank=True, max_length=255,verbose_name=" شناسه فایل منیجر")
     vd_browser_img = models.CharField(blank=True, max_length=255,verbose_name=" ایمیج فایل منیجر")
