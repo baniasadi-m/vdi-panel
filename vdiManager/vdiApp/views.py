@@ -88,15 +88,33 @@ def vdcreate(request):
                 try:
                     r = requests.post(url=url,data=json.dumps(data),headers=headers,verify=False).json()
                     # r={'status':'1','container_spec':{'id':"dfcddevfervervvr",'short_id':"fvdfdre"}}
-                    print(r)
+                    # print(r)
                     if int(r['status']) == 1:
                         temp_form.vd_container_id = r['container_spec']['id']
                         temp_form.vd_container_shortid = r['container_spec']['short_id']
                         temp_form.vd_created_by = str(request.user)
                         temp_form.vd_creator_ip = get_client_ip(request)
-                        temp_form.save()
-                        messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
-                        return redirect('/')
+                        temp_form.vd_browser_img = 'filebrowser/filebrowser'
+                        temp_form.vd_browser_port = '2323'
+                        temp_form.vd_browser_name = temp_form.vd_container_name + 'filebrowser'
+                        data = {
+                                'image': f"{temp_form.vd_browser_img}",
+                                'name' : f"{temp_form.vd_browser_name}",
+                                'cpu' : "2",
+                                'mem' : "1g",
+                                'volumes' : {f"{temp_form.vd_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/srv", 'mode': 'ro'}},
+                                'env' : {"USER":"vdi"},
+                                'ports' : {'80/tcp':int(f"{temp_form.vd_browser_port}")},
+                                }
+                        r = requests.post(url=url,data=json.dumps(data),headers=headers,verify=False).json()
+                        if int(r['status']) == 1:
+                            temp_form.vd_browser_id = r['container_spec']['id']
+                            temp_form.save()
+                            messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
+                            return redirect('/')
+                        else:
+                            messages.add_message(request,messages.ERROR,'API error')
+                            return redirect('/vdcreate')
                 except Exception as e:
                     print(e)
                     messages.add_message(request,messages.ERROR,'API error')
@@ -117,11 +135,15 @@ def vdcreate(request):
 @login_required(login_url='/accounts/login/')
 def vdremove(request,vd_id):
     vd = VirtualDesktop.objects.get(vd_container_id=vd_id)
-    print(vd)
+    container_ids = []
+    data_paths = []
+    container_ids.append(vd.vd_container_id)
+    container_ids.append(vd.vd_browser_id)
+    data_paths.append(f"{vd.vd_server.data_path}/{vd.vd_container_name}")
     import requests,json
-    url = f"{vd.vd_server.server_scheme}://{vd.vd_server.server_ip}:{vd.vd_server.server_port}/api/v1/containers/{vd.vd_container_id}"
+    url = f"{vd.vd_server.server_scheme}://{vd.vd_server.server_ip}:{vd.vd_server.server_port}/api/v1/containers"
     try:
-        data = {'path':f"{vd.vd_server.data_path}/{vd.vd_container_name}"}
+        data = {'path':list(data_paths),'ids': list(container_ids)}
         headers={'Content-Type': 'application/json'}
         r = requests.delete(url=url,headers=headers,data=json.dumps(data),verify=False).json()
         if int(r['status']) == 1:
@@ -129,7 +151,7 @@ def vdremove(request,vd_id):
             vd.vd_is_activate = False
             vd.save()
         else:
-            messages.add_message(request,messages.WARNING,'احتمالا قبلا حذف شده است')
+            messages.add_message(request,messages.WARNING,'حذف دچار مشکل شده ')
 
     except Exception as e:
         print(e)
