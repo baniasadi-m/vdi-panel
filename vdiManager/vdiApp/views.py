@@ -4,34 +4,10 @@ from .forms import CreateVirtualDesktop
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required,permission_required
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger,InvalidPage
-from django.contrib.auth.models import User, Group,Permission
 from django.contrib import messages
-import os
-from django.conf import settings
-from django.http import FileResponse
 from online_users.models import OnlineUserActivity
 from .config import Config
-
-
-from datetime import datetime
-
-def get_current_datetime():
-    return datetime.now()
-  
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
-
-def user_allowed(request,usergroup=[]):
-    for g in usergroup:
-        if request.user.groups.filter(name=f"{g}").exists():
-            return True
-
-    return False
+from .util import get_client_ip, get_current_datetime, get_server, user_allowed, server_status
 
 # Main Dashboard
 @login_required(login_url='/accounts/login/')
@@ -61,28 +37,6 @@ def dashboard(request):
         'current_ip':f"{get_client_ip(request)}",
     }
     return render(request, 'vdiApp/dashboard.html',context=context)
-##################################################    
-def get_server():
-    import requests,json
-    min_load = 500.00
-    servers = VDIServer.objects.all()
-    print(type(servers),servers)
-    headers={'Content-Type': 'application/json'}
-    url=""
-    final_server_id = ""
-    for server in servers:
-        print(server.id,type(server))
-        url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/load"
-        try:
-            result = requests.get(url=url,headers=headers,verify=False).json()
-            if float(result['load']) < min_load:
-                min_load = int(result['load'])
-                final_server_id = server.id
-        except Exception as e:
-            continue
-    final_server = VDIServer.objects.get(id=final_server_id)
-    print(final_server,final_server_id,min_load)
-    return final_server
 
 # Creating vdi container
 @login_required(login_url='/accounts/login/')
@@ -265,16 +219,6 @@ def serverlist(request):
     return render(request, 'vdiApp/serverlist.html',context=context)
 
 
-def server_status(server_url):
-    import requests
-    headers={'Content-Type': 'application/json'}
-    try:
-        r = requests.get(url=server_url,headers=headers,verify=False,timeout=2).json()
-        if int(r['status']) == 1:
-            return True
-    except Exception as e:
-        print(e)
-        return False
 
 # Showing server status and info
 @login_required(login_url='/accounts/login/')

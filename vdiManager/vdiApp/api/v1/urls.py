@@ -4,6 +4,8 @@ from .views import *
 app_name = "api-v1"
 
 urlpatterns =[
-    path('status', api_vdesktops, name='vdesktops')
+    path('desktops', api_vdesktops, name='vdesktops'),
+    path('desktops/<id>', api_vdesktops, name='vdesktops'),
+    # path('desktops', api_vdesktops, name='vdesktops'),
 
 ]
