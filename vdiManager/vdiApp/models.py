@@ -1,5 +1,3 @@
-from faulthandler import is_enabled
-from tabnanny import verbose
 from django.db import models
 from django.forms import ModelForm
 import datetime,os

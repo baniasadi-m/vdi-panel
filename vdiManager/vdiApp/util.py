@@ -1,15 +1,31 @@
 from datetime import datetime
 from .models import VDIServer
+import ldap3
+from .config import Config
+
+def ad_auth_user(server_ip,username, password,domain):
+    server = ldap3.Server(f"ldap://{server_ip}")
+    try:
+        with ldap3.Connection(server, user=f"{username}@{domain}", password=password, auto_bind=True) as conn:
+            # Check that the user is a member of a particular group
+            if conn.search('OU={},DC={},DC={}'.format(Config.Active_Directory_OUName,domain.split('.')[0],Config.Active_Directory_DomainName.split('.')[1]), '(sAMAccountName={})'.format(username), attributes=['memberOf']):
+                return True
+            else:
+                return False
+    except ldap3.core.exceptions.LDAPException as e:
+        print('LDAP authentication failed: {}'.format(e))
+        return False
+
 def get_server():
     import requests
     min_load = 500.00
     servers = VDIServer.objects.all()
-    print(type(servers),servers)
+    # print(type(servers),servers)
     headers={'Content-Type': 'application/json'}
     url=""
     final_server_id = ""
     for server in servers:
-        print(server.id,type(server))
+        # print(server.id,type(server))
         url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/load"
         try:
             result = requests.get(url=url,headers=headers,verify=False).json()
@@ -19,7 +35,7 @@ def get_server():
         except Exception as e:
             continue
     final_server = VDIServer.objects.get(id=final_server_id)
-    print(final_server,final_server_id,min_load)
+    # print(final_server,final_server_id,min_load)
     return final_server
 
 def get_current_datetime():

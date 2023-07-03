@@ -232,7 +232,3 @@ def server_info(request,info_id):
 
     context = {'server': server,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
     return render(request, 'vdiApp/serverinfo.html',context=context)
-
-
-
-    
