@@ -2,19 +2,32 @@ from datetime import datetime
 from .models import VDIServer
 import ldap3
 from .config import Config
+import random
+import string
+
+
+def gen_password(length=12):
+
+    ''' generates a random password '''
+    return ''.join(
+        random.choices(
+            string.ascii_lowercase + string.digits,
+            k=length
+        )
+    )
 
 def ad_auth_user(server_ip,username, password,domain):
     server = ldap3.Server(f"ldap://{server_ip}")
     try:
         with ldap3.Connection(server, user=f"{username}@{domain}", password=password, auto_bind=True) as conn:
             # Check that the user is a member of a particular group
-            if conn.search('OU={},DC={},DC={}'.format(Config.Active_Directory_OUName,domain.split('.')[0],Config.Active_Directory_DomainName.split('.')[1]), '(sAMAccountName={})'.format(username), attributes=['memberOf']):
-                return True
+            if conn.search('OU={},DC={},DC={}'.format(Config.Active_Directory_OUName,domain.split('.')[0],domain.split('.')[1]), '(sAMAccountName={})'.format(username), attributes=['memberOf']):
+                return True,conn.search
             else:
-                return False
+                return False,conn.search
     except ldap3.core.exceptions.LDAPException as e:
         print('LDAP authentication failed: {}'.format(e))
-        return False
+        return False,e
 
 def get_server():
     import requests

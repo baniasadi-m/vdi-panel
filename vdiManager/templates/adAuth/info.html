@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+
+<title>مشخصات  میزکار</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+<style type="text/css">
+    	 .inf-content{
+    border:1px solid #DDDDDD;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    border-radius:10px;
+    box-shadow: 7px 7px 7px rgba(0, 0, 0, 0.3);
+}			                                                      
+    </style>
+</head>
+<body>
+<div class="container bootstrap snippets bootdey">
+<div class="panel-body inf-content">
+<div class="row">
+<div class="col-md-4">
+<img alt style="width:600px;" title class="img-circle img-thumbnail isTooltip" src="{% static 'assets/img/vdi-t500x500-transformed.png' %}" data-original-title="Usuario">
+
+</div>
+<div class="col-md-6">
+<strong>Information</strong><br>
+<div class="table-responsive">
+<table class="table table-user-information">
+<tbody>
+<tr>
+<td>
+<strong>
+<span class="glyphicon glyphicon-phone text-primary"></span>
+VDI Name
+</strong>
+</td>
+<td class="text-primary">
+{{vdi_name}}
+</td>
+</tr>
+<tr>
+<td>
+<strong>
+<span class="glyphicon glyphicon-link  text-primary"></span>
+VDI URL
+</strong>
+</td>
+<td class="text-primary">
+<a href="{{vdi_url}}" target="_blank">{{vdi_url}}</a>
+</td>
+</tr>
+<tr>
+<td>
+<strong>
+<span class="glyphicon glyphicon-cloud text-primary"></span>
+VDI VNCPass
+</strong>
+</td>
+<td class="text-primary">
+{{vdi_vncpass}}
+</td>
+</tr>
+<tr>
+<td>
+<strong>
+<span class="glyphicon glyphicon-link text-primary"></span>
+File Manager
+</strong>
+</td>
+<td class="text-primary">
+    <a href="{{vdi_browser_url}}" target="_blank">{{vdi_browser_url}}</a>
+
+</td>
+</tr>
+<tr>
+<td>
+<strong>
+<span class="glyphicon glyphicon-user  text-primary"></span>
+File Manager User
+</strong>
+</td>
+<td class="text-primary">
+{{vdi_browser_user}}
+</td>
+</tr>
+<tr>
+<td>
+<strong>
+<span class="glyphicon glyphicon-lock text-primary"></span>
+File Manager Pass
+</strong>
+</td>
+<td class="text-primary">
+{{vdi_browser_pass}}
+</td>
+</tr>
+<tr>
+<td>
+<strong>
+<span class="glyphicon glyphicon-calendar text-primary"></span>
+VDI Created
+</strong>
+</td>
+<td class="text-primary">
+{{vdi_created_at}}
+</td>
+</tr>
+<tr>
+<td>
+<strong>
+<span class="glyphicon glyphicon-calendar text-primary"></span>
+VDI Expired
+</strong>
+</td>
+<td class="text-primary">
+{{vdi_expired_at}}
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+	
+</script>
+</body>
+</html>

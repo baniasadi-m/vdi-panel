@@ -3,7 +3,7 @@ from .views import *
 
 app_name = 'vdiApp'
 urlpatterns = [
-    path('',dashboard , name='dashboard'),
+    path('dashboard/',dashboard , name='dashboard'),
     path('search/',search , name='search'), 
     path('vdcreate/',vdcreate , name='vdcreate'), 
     path('vdlist/',vdlist , name='vdlist'), 
