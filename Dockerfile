@@ -38,6 +38,8 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
+RUN rm -f nginx_default.conf
+
 RUN chown -R www-data:www-data /opt/app
 
 
