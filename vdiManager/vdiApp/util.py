@@ -1,7 +1,7 @@
 from datetime import datetime
 from .models import VDIServer
 import ldap3
-from .config import Config
+from vdiManager.settings import Config
 import random
 import string
 

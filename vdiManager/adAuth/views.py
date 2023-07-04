@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse,redirect
 from vdiApp.models import VirtualDesktop
 from django.contrib import messages
 from vdiApp.util import ad_auth_user, get_server, gen_password, get_client_ip
-from vdiApp.config import Config
+from vdiManager.settings import Config
 # Create your views here.
 def adauth_get_info(request):
     context ={}

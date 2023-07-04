@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+from os import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,10 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-l*huv-1od@5(g5c%rahds=6apcb11hyh!f9zz1ctc_x!&n=+wz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = environ.get("VDI_PANEL_WHITELIST_IPS").split(",")
 
 # Application definition
 
@@ -81,20 +82,27 @@ WSGI_APPLICATION = 'vdiManager.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+DB ={
+    "MYSQL_DB_NAME": environ.get("VDI_MYSQL_DB"),
+    "MYSQL_DB_USER":environ.get("VDI_MYSQL_USER"),
+    "MYSQL_DB_PASSWORD":environ.get("VDI_MYSQL_PASSWORD"),
+    "MYSQL_DB_HOST":environ.get("VDI_MYSQL_HOST"),
+    "MYSQL_DB_PORT":environ.get("VDI_MYSQL_PORT"),
 
+}
 DATABASES = {
-        # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql', 
-    #     'NAME': MYSQL_DB_NAME,
-    #     'USER': MYSQL_DB_USER,
-    #     'PASSWORD': MYSQL_DB_PASSWORD,
-    #     'HOST': MYSQL_DB_HOST,   # Or an IP Address that your DB is hosted on
-    #     'PORT': MYSQL_DB_PORT,
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': DB["MYSQL_DB_NAME"],
+        'USER': DB["MYSQL_DB_USER"],
+        'PASSWORD': DB["MYSQL_DB_PASSWORD"],
+        'HOST': DB["MYSQL_DB_HOST"],   # Or an IP Address that your DB is hosted on
+        'PORT': DB["MYSQL_DB_PORT"],
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
 }
 
 
@@ -176,3 +184,15 @@ JALALI_DATE_DEFAULTS = {
         }
     },
 }
+
+########### App Configs   ##########
+
+class Config:
+    DOCKER_DESKTOP_IMAGE = environ.get('VDI_DESKTOP_IMAGE')
+    DOCKER_BROWSER_IMAGE = environ.get('VDI_BROWSER_IMAGE')
+    Active_Directory_OUName = environ.get('VDI_AD_OUName')
+    Active_Directory_DomainName = environ.get('VDI_AD_DomainName')
+    Active_Directory_ServerIP = environ.get('VDI_AD_ServerIP')
+    GUNICORN_BIND = environ.get("VDI_GUNICORN_BIND")
+    GUNICORN_ACCESS_LOG = environ.get('VDI_ACCESS_LOG_DIR')
+    GUNICORN_ERROR_LOG = environ.get('VDI_ERROR_LOG_DIR')

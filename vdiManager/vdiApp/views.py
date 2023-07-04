@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger,InvalidPage
 from django.contrib import messages
 from online_users.models import OnlineUserActivity
-from .config import Config
+from vdiManager.settings import Config
 from .util import get_client_ip, get_current_datetime, get_server, user_allowed, server_status
 
 # Main Dashboard

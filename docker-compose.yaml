@@ -1,0 +1,65 @@
+version: !!str 3.9
+
+networks:
+  newsvit-br:
+    name: vdi-br
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 192.168.100.0/24
+         gateway: 192.168.100.1
+
+services:
+  vdi-db:
+    image: mariadb:10.6
+    container_name: "vdi-panel-db"
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 3s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      newsvit-br:
+        ipv4_address: 192.168.100.2
+    
+    environment:
+      - MYSQL_ROOT_PASSWORD=masoud123
+      - MYSQL_DATABASE=vdipanel
+      - MYSQL_USER=masoud
+      - MYSQL_PASSWORD=masoud
+    expose:
+      - 3306
+
+
+  vdi-panel:
+    container_name: "vdi-panel-web"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      vdi-db:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - 80:80
+
+    networks:
+      newsvit-br:
+        ipv4_address: 192.168.100.3
+ 
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: "vdi-panel-phpmyadmin"
+    restart: always
+    ports:
+      - 8888:80
+    environment:
+      - PMA_ARBITRARY=1
+    networks:
+      newsvit-br:
+        ipv4_address: 192.168.100.4

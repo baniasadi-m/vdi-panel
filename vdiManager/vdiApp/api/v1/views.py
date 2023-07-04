@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import VDISerializer,VDIPostSerializer
 from ...models import VirtualDesktop,VDIServer
-from ...config import Config
+from vdiManager.settings import Config
 from ...util import get_client_ip, get_server
 
 from django.shortcuts import get_object_or_404
