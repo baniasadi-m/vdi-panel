@@ -4,7 +4,7 @@ from rest_framework import status
 from .serializers import VDISerializer,VDIPostSerializer
 from ...models import VirtualDesktop,VDIServer
 from ...config import Config
-from ...util import get_client_ip, get_current_datetime, get_server, user_allowed, server_status
+from ...util import get_client_ip, get_server
 
 from django.shortcuts import get_object_or_404
 
@@ -26,19 +26,30 @@ def api_vdesktops(request,id=None):
     elif request.method == 'POST':
         mydata = request.data
         elect_server = get_server()
+        print(type(elect_server))
         other_data = {
             "vd_container_cpu" : '2',
             "vd_container_mem" : '2g',
             "vd_container_img" : f"{Config.DOCKER_DESKTOP_IMAGE}",
             "vd_creator_ip" : f"{get_client_ip(request)}",
-            "vd_server" : [elect_server.id]
+            "vd_server" : elect_server
+ 
+                # {
+                #     "id": f"{elect_server.id}",
+                #     "server_name": f"{elect_server.server_name}",
+                #     "server_ip": f"{elect_server.server_ip}",
+                #     "data_path": f"{elect_server.data_path}",
+                #     "server_port": f"{elect_server.server_port}",
+                #     "server_scheme": f"{elect_server.server_scheme}",
+                #     "description": f"{elect_server.description}",
 
-
+                # }
+            
         }
 
         mydata.update(other_data)
         serializer = VDIPostSerializer(data=mydata)
-        # print(mydata,serializer)
+        print(serializer)
 
 
         # serializer.vd_container_name = request.data['vd_container_name']
@@ -67,7 +78,7 @@ def api_vdesktops(request,id=None):
                 'ports' : ['80'],
                 # 'ports' : {'80/tcp':int(f"{temp_form.vd_port}")},
                 }
-        print(data)
+        # print(data)
         import requests, json
         # try:
             # r = requests.post(url=url,data=json.dumps(data),headers=headers,verify=False).json()
@@ -81,7 +92,7 @@ def api_vdesktops(request,id=None):
         # except Exception as e:
         #     print(e)
 
-        print("init data:",serializer.initial_data)
+        # print("init data:",serializer.initial_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
