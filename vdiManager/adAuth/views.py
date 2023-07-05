@@ -33,7 +33,7 @@ def adauth_list_info(request):
                     'cpu' : f"2",
                     'mem' : f"2g",
                     'volumes' : {f"{server.data_path}/{vdi_name}/Downloads": {'bind': f"/home/{username}/Downloads", 'mode': 'rw'}},
-                    'env' : {"USER":f"{username}","PASSWORD":f"{password}","VNC_PASSWORD":f"{vnc_pass}"},
+                    'env' : {"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}"},
                     'ports' : ['80'],
                     }
             try:
