@@ -1,6 +1,7 @@
 from datetime import datetime
 from .models import VDIServer
 import ldap3
+from ldap3 import Server, Connection, SUBTREE
 from vdiManager.settings import Config
 import random
 import string
@@ -29,6 +30,25 @@ def ad_auth_user(server_ip,username, password,domain):
         print('LDAP authentication failed: {}'.format(e))
         return False,e
 
+def getUsersInGroup(server_ip,username, password,domain,group):
+    SearchBase= f"DC={domain.split('.')[0]},DC={domain.split('.')[1]}"
+    server = Server(server_ip)
+    try:
+        conn = Connection(server, user=username, password=password, auto_bind=True)
+        conn.bind()
+        if conn.search(search_base=SearchBase,
+                    search_filter='(&(objectClass=GROUP)(cn=' + group +'))', search_scope=SUBTREE,
+                    attributes=['member'], size_limit=0):
+            #result = conn.entries
+            result = conn.response_to_json()
+            conn.unbind() 
+            return True,result
+        else:
+            return False,result
+    except ldap3.core.exceptions.LDAPException as e:
+        print('LDAP authentication failed: {}'.format(e))
+        return False,e
+    
 def get_server():
     import requests
     min_load = 500.00

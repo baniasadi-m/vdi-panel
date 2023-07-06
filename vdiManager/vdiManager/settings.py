@@ -191,6 +191,7 @@ class Config:
     DOCKER_DESKTOP_IMAGE = environ.get('VDI_DESKTOP_IMAGE')
     DOCKER_BROWSER_IMAGE = environ.get('VDI_BROWSER_IMAGE')
     Active_Directory_OUName = environ.get('VDI_AD_OUName')
+    Active_Directory_GroupName = environ.get('VDI_AD_GroupName')
     Active_Directory_DomainName = environ.get('VDI_AD_DomainName')
     Active_Directory_ServerIP = environ.get('VDI_AD_ServerIP')
     GUNICORN_BIND = environ.get("VDI_GUNICORN_BIND")

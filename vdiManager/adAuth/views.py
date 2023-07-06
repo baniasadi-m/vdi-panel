@@ -1,7 +1,7 @@
 from django.shortcuts import render,HttpResponse,redirect
 from vdiApp.models import VirtualDesktop
 from django.contrib import messages
-from vdiApp.util import ad_auth_user, get_server, gen_password, get_client_ip
+from vdiApp.util import ad_auth_user, get_server, gen_password, get_client_ip,getUsersInGroup
 from vdiManager.settings import Config
 # Create your views here.
 def adauth_get_info(request):
@@ -12,7 +12,8 @@ def adauth_list_info(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        myvdi = ad_auth_user(server_ip=f"{Config.Active_Directory_ServerIP}",username= username, password= password,domain=Config.Active_Directory_DomainName)
+        # myvdi = ad_auth_user(server_ip=f"{Config.Active_Directory_ServerIP}",username= username, password= password,domain=Config.Active_Directory_DomainName)
+        myvdi = getUsersInGroup(server_ip=f"{Config.Active_Directory_ServerIP}",username= username, password= password,domain=Config.Active_Directory_DomainName,group=Config.Active_Directory_GroupName)
 
         if myvdi != None and myvdi[0] == True :
             vdi_name = f"{username}-vdi"

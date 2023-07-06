@@ -24,15 +24,13 @@ services:
     networks:
       newsvit-br:
         ipv4_address: 192.168.100.2
-    
     environment:
       - MYSQL_ROOT_PASSWORD=masoud123
-      - MYSQL_DATABASE=vdipanel
-      - MYSQL_USER=masoud
-      - MYSQL_PASSWORD=masoud
+      - MYSQL_DATABASE=${VDI_MYSQL_DB}
+      - MYSQL_USER=${VDI_MYSQL_USER}
+      - MYSQL_PASSWORD=${VDI_MYSQL_PASSWORD}
     expose:
-      - 3306
-
+      - ${VDI_MYSQL_PORT}
 
   vdi-panel:
     container_name: "vdi-panel-web"
