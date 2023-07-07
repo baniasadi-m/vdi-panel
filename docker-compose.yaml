@@ -29,7 +29,7 @@ services:
       - MYSQL_DATABASE=${VDI_MYSQL_DB}
       - MYSQL_USER=${VDI_MYSQL_USER}
       - MYSQL_PASSWORD=${VDI_MYSQL_PASSWORD}
-    ports:
+    expose:
       - ${VDI_MYSQL_PORT}
 
   vdi-panel:
