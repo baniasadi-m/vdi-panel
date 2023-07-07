@@ -22,6 +22,8 @@
 if which docker > /dev/null 2>&1; then
     if [ $siganl_compose == 'up' ];then
         docker compose up -d --quiet-pull
+    elif [ $siganl_compose == 'build' ];then
+        docker compose build
     elif [ $siganl_compose == 'down' ];then
         docker compose down
     fi
