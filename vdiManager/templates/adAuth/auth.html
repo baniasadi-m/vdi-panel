@@ -12,7 +12,14 @@
 	body {
 	  background-image: url("{% static 'assets/img/gonbad.jpg' %}");
 	}
-	</style> 
+
+	#id_captcha_1 {
+    max-width: 100px;
+    margin-top: 8px;
+}
+</style> 
+
+
 <body>
 	<section class="h-100">
 		<div class="container h-100">
@@ -50,13 +57,16 @@
 								    	Password is required
 							    	</div>
 								</div>
-
+								<div class="mb-3">
+											{{captcha_form.captcha}}
+								</div>
 								<div class="d-flex align-items-center">
 									<!-- <div class="form-check">
 										<input type="checkbox" name="remember" id="remember" class="form-check-input">
 										<label for="remember" class="form-check-label">Remember Me</label>
 									</div> -->
 									<input type="hidden" name="next" value="{{ request.GET.next }}"/>
+
 									<button type="submit" class="btn btn-primary ms-auto">
 										Login
 									</button>

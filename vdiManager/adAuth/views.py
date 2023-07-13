@@ -3,9 +3,11 @@ from vdiApp.models import VirtualDesktop
 from django.contrib import messages
 from vdiApp.util import ad_auth_user, get_server, gen_password, get_client_ip,getUsersInGroup
 from vdiManager.settings import Config
+from .forms import CaptchaForm
 # Create your views here.
 def adauth_get_info(request):
-    context ={}
+    form = CaptchaForm()
+    context ={'captcha_form': form}
     return render(request, 'adAuth/auth.html',context=context)
     
 def adauth_list_info(request):

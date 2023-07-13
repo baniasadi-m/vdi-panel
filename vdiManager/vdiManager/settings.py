@@ -45,8 +45,12 @@ INSTALLED_APPS = [
     'accounts',
     'online_users',
     'rest_framework',
+    'captcha',
   
 ]
+########  Captcha Config ###########
+CAPTCHA_FONT_SIZE = 35
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
