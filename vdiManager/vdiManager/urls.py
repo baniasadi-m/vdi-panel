@@ -25,7 +25,7 @@ urlpatterns = [
     path('', include('vdiApp.urls')),
     path('accounts/', include('accounts.urls')),
     path('', include('adAuth.urls')),
-    path('/captcha',include("captcha.urls")),
+    path('captcha',include("captcha.urls")),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

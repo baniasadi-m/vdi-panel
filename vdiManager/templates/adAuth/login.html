@@ -1,0 +1,86 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ورود</title>
+	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+	<link href="{% static 'assets/css/bootstrap-5.0.0-beta2.min.css' %}" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+</head>
+<style>
+	body {
+	  background-image: url("{% static 'assets/img/gonbad.jpg' %}");
+	}
+
+	#id_captcha_1 {
+    max-width: 100px;
+    margin-top: 8px;
+}
+</style> 
+
+
+<body>
+	<section class="h-100">
+		<div class="container h-100">
+			<div class="row justify-content-sm-center h-100">
+				<div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+					<div class="text-center my-5">
+						
+						<img src="{% static 'assets/img/aqr.png' %}" alt="logo" width="100">
+					</div>
+					<div class="card shadow-lg">
+
+
+
+						<div class="card-body p-5">
+							<h1 class="fs-4 card-title fw-bold mb-4">Login</h1>
+							<form method="POST" action="{% url 'adAuth:listinfo' %}" class="needs-validation" novalidate="" autocomplete="off">
+								{% csrf_token %}
+						
+									{{captcha_form.as_p}}
+							
+					
+							
+					
+
+									<button type="submit" class="btn btn-primary ms-auto">
+										Login
+									</button>
+								</div>
+
+							</form>
+						</div>
+						<!-- <div class="card-footer py-3 border-0">
+							<div class="text-center">
+								Don't have an account? <a href="register.html" class="text-dark">Create One</a>
+							</div>
+						</div> -->
+					</div>
+					<div class="text-center mt-5 text-muted">
+					تمام حقوق این وبگاه متعلق به آستان قدس رضوی است
+
+					</div>
+					{% if messages %}
+					<div class="row">
+					<div class="text-center mt-5 text-muted">
+						{% for message in messages %}
+						<div class="alert alert-{{ message.tags }}" role="alert">
+						  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="True">&times;</span>
+						  </button>
+							<h1 ><p style="color: rgb(172, 84, 43)">{{ message }}</p></h1>
+						</div>
+						{% endfor %}
+					  </div>
+				  
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- <script src="{% static 'assets/js/login.js' %}"></script> -->
+</body>
+</html>
