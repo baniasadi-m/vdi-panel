@@ -4,7 +4,7 @@ from rest_framework import status
 from .serializers import VDISerializer,VDIPostSerializer
 from ...models import VirtualDesktop,VDIServer
 from vdiManager.settings import Config
-from ...util import get_client_ip, get_server
+from ...util import get_client_ip, get_server, jwt_gen_token
 
 from django.shortcuts import get_object_or_404
 
@@ -68,6 +68,12 @@ def api_vdesktops(request,id=None):
         url = f"{elect_server.server_scheme}://{elect_server.server_ip}:{elect_server.server_port}/api/v1/containers"
         # url = f"{serializer.server.server_scheme}://{serializer.server.server_ip}:{serializer.server.server_port}/api/v1/containers"
         headers={'Content-Type': 'application/json'}
+        jwt_token = jwt_gen_token()
+        headers.update(
+            {
+                'jwt': f"{jwt_token}"
+            }
+        )
         data = {
                 'image': f"{mydata['vd_container_img']}",
                 'name' : f"{mydata['vd_container_name']}",

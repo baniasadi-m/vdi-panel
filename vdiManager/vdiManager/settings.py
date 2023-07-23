@@ -201,3 +201,6 @@ class Config:
     GUNICORN_BIND = environ.get("VDI_GUNICORN_BIND")
     GUNICORN_ACCESS_LOG = environ.get('VDI_ACCESS_LOG_DIR')
     GUNICORN_ERROR_LOG = environ.get('VDI_ERROR_LOG_DIR')
+    AGENT_JWT_SECRET = environ.get('AGENT_JWT_SECRET')
+    AGENT_JWT_ISSUER = environ.get('AGENT_JWT_ISSUER')    
+    AGENT_JWT_ALGO = environ.get('AGENT_JWT_ALGO')    

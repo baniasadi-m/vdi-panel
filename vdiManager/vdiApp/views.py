@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger,InvalidP
 from django.contrib import messages
 from online_users.models import OnlineUserActivity
 from vdiManager.settings import Config
-from .util import get_client_ip, get_current_datetime, get_server, user_allowed, server_status
+from .util import get_client_ip, get_current_datetime, get_server, user_allowed, server_status, jwt_gen_token
 
 # Main Dashboard
 @login_required(login_url='/accounts/login/')
@@ -54,6 +54,13 @@ def vdcreate(request):
                 # temp_form.vd_server.server_ip = get_server()
                 url = f"{temp_form.vd_server.server_scheme}://{temp_form.vd_server.server_ip}:{temp_form.vd_server.server_port}/api/v1/containers"
                 headers={'Content-Type': 'application/json'}
+                jwt_token = jwt_gen_token()
+                headers.update(
+                    {
+                        'jwt': f"{jwt_token}"
+                    }
+                )
+              
                 data = {
                         'image': f"{temp_form.vd_container_img}",
                         'name' : f"{temp_form.vd_container_name}",
@@ -141,6 +148,12 @@ def vdremove(request,vd_id):
     try:
         data = {'path':list(data_paths),'ids': list(container_ids)}
         headers={'Content-Type': 'application/json'}
+        jwt_token = jwt_gen_token()
+        headers.update(
+            {
+                'jwt': f"{jwt_token}"
+            }
+        )
         r = requests.delete(url=url,headers=headers,data=json.dumps(data),verify=False).json()
         if int(r['status']) == 1:
             messages.add_message(request,messages.SUCCESS,'میزکار با مشخصات ذیل حذف شد')

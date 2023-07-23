@@ -1,7 +1,7 @@
 from django.shortcuts import render,HttpResponse,redirect
 from vdiApp.models import VirtualDesktop
 from django.contrib import messages
-from vdiApp.util import ad_auth_user, get_server, gen_password, get_client_ip,getUsersInGroup
+from vdiApp.util import ad_auth_user, get_server, gen_password, get_client_ip, getUsersInGroup, jwt_gen_token
 from vdiManager.settings import Config
 from .forms import CaptchaLoginForm
 # Create your views here.
@@ -33,6 +33,10 @@ def adauth_list_info(request):
 
                 url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/containers"
                 headers={'Content-Type': 'application/json'}
+                jwt_token = jwt_gen_token()
+                headers.update({
+                    'jwt':f"{jwt_token}"
+                })
                 data = {
                         'image': f"{Config.DOCKER_DESKTOP_IMAGE}",
                         'name' : f"{vdi_name}",

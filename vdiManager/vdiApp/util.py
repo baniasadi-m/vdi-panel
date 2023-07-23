@@ -6,6 +6,21 @@ from vdiManager.settings import Config
 import random
 import string
 
+from jwt import encode
+import time
+
+def jwt_gen_token():
+    current_time = int(time.time())
+    payload ={
+        "iss": f"{Config.AGENT_JWT_ISSUER}",
+        "iat": current_time - 60,
+        "exp": current_time + 60,
+        "nbf": current_time - 3600,
+    }
+    secret = Config.AGENT_JWT_SECRET
+
+    return encode(payload,secret,Config.AGENT_JWT_ALGO)
+
 
 def gen_password(length=12):
 
@@ -91,6 +106,12 @@ def user_allowed(request,usergroup=[]):
 def server_status(server_url):
     import requests
     headers={'Content-Type': 'application/json'}
+    jwt_token = jwt_gen_token()
+    headers.update(
+        {
+            'jwt': f"{jwt_token}"
+        }
+    )
     try:
         r = requests.get(url=server_url,headers=headers,verify=False,timeout=2).json()
         if int(r['status']) == 1:
