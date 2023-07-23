@@ -70,6 +70,12 @@ def get_server():
     servers = VDIServer.objects.all()
     # print(type(servers),servers)
     headers={'Content-Type': 'application/json'}
+    jwt_token = jwt_gen_token()
+    headers.update(
+        {
+            'jwt': f"{jwt_token}"
+        }
+    )
     url=""
     final_server_id = ""
     for server in servers:
