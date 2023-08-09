@@ -46,7 +46,8 @@ def ad_auth_user(server_ip,username, password,domain):
         return False,e
 
 def getUsersInGroup(server_ip,username, password,domain,group):
-    SearchBase= f"DC={domain.split('.')[0]},DC={domain.split('.')[1]}"
+    # SearchBase= f"DC={domain.split('.')[0]},DC={domain.split('.')[1]}"
+    SearchBase= "DC=" + domain.replace(".", ",DC=")
     server = Server(server_ip)
     try:
         conn = Connection(server, user=username, password=password, auto_bind=True)
