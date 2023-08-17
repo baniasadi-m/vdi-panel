@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load jalali_tags %}
+{% block contentwraper %}
+<h1 class="m-0 text-dark">مشخصات پروفایل</h1>
+<hr>
+{% endblock%}
+
+{% block maincontent %}
+<div class="content-wraper">
+    {% if messages %}
+    <div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="True">&times;</span>
+          </button>
+            <h1 ><p style="color: blue">{{ message }}</p></h1>
+        </div>
+        {% endfor %}
+      </div>
+  
+    </div>
+  {% endif %}
+  
+    <h1 name="national_id">نام پروفایل:{{profile.owner_name }}</h1>
+    <hr>
+    <h1>User:{{profile.owner_user}}</h1>
+    <h1>Password:{{profile.owner_password }}</h1>
+    <h1>Container IP:{{profile.owner_ip }}</h1>
+    <h1>Fbrowser:{{profile.owner_browser_ip}}</h1>
+    <h1>Created Number: {{profile.owner_vd_created_number}}</h1>
+    <h1>LDAP: {{profile.owner_create_by_ldap}} </h1>
+    <h1>Activate: {{profile.owner_is_active}} </h1>
+    <h1>توضیحات:{{profile.owner_description }}</h1>
+    <h1>تاریخ ایجاد:{{profile.owner_created_at|to_jalali:'%Y/%m/%d'}}</h1>
+    <h1>آخرین بروزرسانی:{{profile.owner_updated_at|to_jalali:'%Y/%m/%d'}}</h1>
+
+</div>
+
+    {% endblock %}

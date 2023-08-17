@@ -20,7 +20,9 @@ class CreateVirtualDesktop(forms.ModelForm):
     vd_container_cpu = forms.ChoiceField(choices=cpu_choices,label='پردازنده')
     vd_container_mem = forms.ChoiceField(choices=mem_choices,label='حافظه')
  
-class CreateOwner(forms.ModelForm):
+class CreateProfile(forms.ModelForm):
+    is_active = forms.CharField(required=False,widget=forms.CheckboxInput,label='فعال')
+    is_ldap = forms.CharField(required=False,widget=forms.CheckboxInput,label='ldap')
     class Meta:
         model = UserProfile
-        fields = ['owner_name','owner_user','owner_ip','owner_browser_ip','owner_description']
+        fields = ['owner_name','owner_user','owner_password','owner_ip','owner_browser_ip','owner_description']
