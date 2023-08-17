@@ -1,5 +1,5 @@
 from django import forms
-from .models import VirtualDesktop
+from .models import VirtualDesktop,UserProfile
 
 cpu_choices =[
     ('2','2 core'),
@@ -20,3 +20,7 @@ class CreateVirtualDesktop(forms.ModelForm):
     vd_container_cpu = forms.ChoiceField(choices=cpu_choices,label='پردازنده')
     vd_container_mem = forms.ChoiceField(choices=mem_choices,label='حافظه')
  
+class CreateOwner(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['owner_name','owner_user','owner_ip','owner_browser_ip','owner_description']

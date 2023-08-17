@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from vdiApp.models import VDIServer,VirtualDesktop
+from vdiApp.models import VDIServer,VirtualDesktop,UserProfile
 
 
 class VirtualDesktopAdmin(admin.ModelAdmin):
@@ -12,7 +12,11 @@ class VirtualDesktopAdmin(admin.ModelAdmin):
     ]
     search_fields = ['vd_owner','vd_letter_number','vd_created_by']
 class VDIServerAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['server_name','server_ip','server_port','server_hostname','is_enabled']
+
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display=['owner_name','owner_user','owner_ip','owner_browser_ip','owner_vd_created_number','owner_created_at','owner_updated_at']
 
 admin.site.register(VirtualDesktop,VirtualDesktopAdmin)
 admin.site.register(VDIServer,VDIServerAdmin)
+admin.site.register(UserProfile,UserProfileAdmin)

@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,HttpResponse
-from .models import VirtualDesktop,VDIServer
-from .forms import CreateVirtualDesktop
+from .models import VirtualDesktop,VDIServer, UserProfile
+from .forms import CreateVirtualDesktop, CreateOwner
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required,permission_required
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger,InvalidPage
@@ -143,10 +143,13 @@ def vdremove(request,vd_id):
     container_ids.append(vd.vd_container_id)
     container_ids.append(vd.vd_browser_id)
     data_paths.append(f"{vd.vd_server.data_path}/{vd.vd_container_name}")
+    users=[]
+    users.append(vd.vd_owner.owner_user)
+    print(users)
     import requests,json
     url = f"{vd.vd_server.server_scheme}://{vd.vd_server.server_ip}:{vd.vd_server.server_port}/api/v1/containers"
     try:
-        data = {'path':list(data_paths),'ids': list(container_ids)}
+        data = {'path':list(data_paths),'ids': list(container_ids),'user':users}
         headers={'Content-Type': 'application/json'}
         jwt_token = jwt_gen_token()
         headers.update(
@@ -245,3 +248,44 @@ def server_info(request,info_id):
 
     context = {'server': server,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
     return render(request, 'vdiApp/serverinfo.html',context=context)
+
+# @login_required(login_url='/accounts/login/')
+# def owner_create(request):
+#     if user_allowed(request,usergroup=['vdadmin']):
+#         if request.method == 'POST':
+#             form=CreateOwner(request.POST)
+#             if form.is_valid():
+#                 form.save()
+#                 context={
+
+#                 }
+#                 messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
+#                 return redirect(f"/vdinfo/{temp_form.vd_container_shortid}")
+#                 return  render(request,'vdiApp/serverinfo.html',context=context)
+@login_required(login_url='/accounts/login/')
+def owner_list(request):
+    if user_allowed(request,usergroup=['vdadmin']):
+        pass
+@login_required(login_url='/accounts/login/')
+def owner_info(request,info_id):
+    if user_allowed(request,usergroup=['vdadmin']):
+        try:
+            owner = UserProfile.objects.get(owner_user=info_id)
+        except Exception as e:
+            print(f"owner info exception: {e}")
+            messages.add_message(request,messages.WARNING,'خطا در دریافت اطلاعات کاربر')
+            return redirect('/ownerlist')
+
+        context={
+            "owner_name":owner.owner_name,
+            "owner_user":owner.owner_user,
+            "owner_ip":owner.owner_ip,
+            "owner_browser_ip":owner.owner_browser_ip,
+            "owner_vd_created_number":owner.owner_vd_created_number,
+            "owner_description":owner.owner_description,
+            "owner_is_active": owner.owner_is_active,
+            "owner_created_at": owner.owner_created_at,
+            "owner_updated_at": owner.owner_updated_at,
+
+        }
+        return  render(request,'vdiApp/ownerinfo.html',context=context)
