@@ -27,15 +27,16 @@
       <div class="container-fluid">
 
 
-          <form action="{% url 'vdiApp:profileinfo' info_id=profile_id %}" method="post">
+          <form action="{% url 'vdiApp:profileedit' profile_id=profile_id %}" method="post">
             {% csrf_token %}
             
             <div class="row ">
+              
                 {{ form|bootstrap }}
             </div> 
     <p>{{v}}</p>
     <!-- Submit button -->
-    <button type="submit" class="btn btn-primary btn-block mb-4">ایجاد میزکار</button>
+    <button type="submit" class="btn btn-primary btn-block mb-4">ویرایش پروفایل</button>
   </form>
 
   

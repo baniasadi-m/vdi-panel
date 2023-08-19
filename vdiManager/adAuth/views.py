@@ -281,6 +281,7 @@ def adauth_list_info(request):
                         messages.add_message(request,messages.ERROR,'Authentication Failed')
                         return redirect('/')
                     elif ldap_user[0] == True:
+                        profile_update_password(username=username,password=password)
                         owner = get_profile_or_None(user=username,password=password)
                         print("owner",owner)
                         if owner != None:  

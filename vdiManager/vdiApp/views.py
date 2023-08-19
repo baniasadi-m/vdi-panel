@@ -305,35 +305,53 @@ def profile_info(request,info_id):
         return  render(request,'vdiApp/profileinfo.html',context=context)
 
 @login_required(login_url='/accounts/login/')
-def profile_edit(request,profile_id):
+def profile_edit(request,profile_id= None):
     if user_allowed(request,usergroup=['vdadmin']):
-        
-        try:
-            profile = UserProfile.objects.get(owner_user=profile_id)
-            
-        except Exception as e:
-            print(f"profile info exception: {e}")
-            messages.add_message(request,messages.WARNING,'خطا در دریافت اطلاعات کاربر')
-            return redirect('/profilelist')
+        if profile_id == None:
+            all_entries = UserProfile.objects.all()
+            paginator = Paginator(all_entries,10)
+            page_number = request.GET.get('page')
+            try:
+                vds = paginator.get_page(page_number)
+            except PageNotAnInteger:
+                vds = paginator.get_page(1)
+            except EmptyPage:
+                vds = paginator.get_page(1)
+            except InvalidPage:
+                vds = paginator.get_page(1)
+            context = {'profiles': vds,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+            return render(request, 'vdiApp/profileeditlist.html',context=context)
+       
+        else:
+            try:
+                profile = UserProfile.objects.get(owner_user=profile_id)
+                
+            except Exception as e:
+                print(f"profile info exception: {e}")
+                messages.add_message(request,messages.WARNING,'خطا در دریافت اطلاعات کاربر')
+                return redirect('/profilelist')
 
-        
-        if request.method == 'POST':
-            form = CreateProfile(request.POST, instance=profile)
-            tmp_form = form.save(commit=False)
-            if 'is_active' in request.POST:
-                tmp_form.owner_is_active =True
-            else:
-                tmp_form.owner_is_active =False
-            if 'is_ldap' in request.POST:
-                tmp_form.owner_create_by_ldap =True
-            else:
-                tmp_form.owner_create_by_ldap =False 
-            messages.add_message(request,messages.SUCCESS,' اطلاعات کاربر بروزرسانی شد')   
-            tmp_form.save()
-        form =  CreateProfile(instance=profile)
-        context = {'form':form,'profile_id':profile.owner_user}
-        
-        return  render(request,'vdiApp/profileedit.html',context=context)
+            
+            if request.method == 'POST':
+                print(request.POST)
+                form = CreateProfile(request.POST, instance=profile)
+                tmp_form = form.save(commit=False)
+                if 'owner_is_active' in request.POST:
+                    tmp_form.owner_is_active =True
+                else:
+                    tmp_form.owner_is_active =False
+                if 'owner_create_by_ldap' in request.POST:
+                    tmp_form.owner_create_by_ldap =True
+                else:
+                    tmp_form.owner_create_by_ldap =False 
+                messages.add_message(request,messages.SUCCESS,' اطلاعات کاربر بروزرسانی شد')   
+                tmp_form.save()
+                return redirect('/profilelist')
+
+            form =  CreateProfile(instance=profile)
+            context = {'form':form,'profile_id':profile.owner_user,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+            
+            return  render(request,'vdiApp/profileedit.html',context=context)
 # Remove profile
 @login_required(login_url='/accounts/login/')
 def profile_remove(request,profile_id):

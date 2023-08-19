@@ -16,5 +16,6 @@ urlpatterns = [
     path('profileinfo/<info_id>',profile_info , name='profileinfo'),
     path('profileremove/<profile_id>',profile_remove , name='profileremove'),
     path('profileedit/<profile_id>',profile_edit , name='profileedit'),
+    path('profileedit/',profile_edit , name='profileedit'),
     path('api/v1/',include('vdiApp.api.v1.urls')),
 ]

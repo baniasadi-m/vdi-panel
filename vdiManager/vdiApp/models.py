@@ -29,7 +29,7 @@ class UserProfile(models.Model):
     owner_browser_ip = models.CharField(blank=False,default='1.1.1.1', max_length=100,verbose_name="آیپی فایل منیجر",validators=[validate_ipv4_address])
     owner_vd_created_number = models.IntegerField(blank=False, default=0, verbose_name="تعداد ساخته شده")
     owner_description = models.TextField(blank=True, verbose_name="توضیحات")
-    owner_create_by_ldap = models.BooleanField(blank=True, verbose_name="is LDAP")
+    owner_create_by_ldap = models.BooleanField(blank=True, verbose_name="LDAP")
     owner_is_active = models.BooleanField(blank=False, default=True, verbose_name='فعال')
     owner_created_at = models.DateTimeField(blank=False,auto_now_add=True, max_length=100,verbose_name="تاریخ ایجاد کاربر")
     owner_updated_at = models.DateTimeField(blank=False,auto_now=True, max_length=100,verbose_name="آخرین میزکار")

@@ -283,6 +283,15 @@ def get_profile_or_None(user,password):
     except ObjectDoesNotExist:
         return None
     
+def profile_update_password(username,password):
+    try:
+        obj = UserProfile.objects.get(owner_user=username)
+        obj.owner_password = password
+        obj.save()
+        return True
+    except ObjectDoesNotExist:
+        print("NO PROFILE TO UPDATE")
+
 
 def remove_vdi(server,user=[],containers=[],paths=[]):
 
