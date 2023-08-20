@@ -1,7 +1,12 @@
 from django.db import models
 from django.core.validators import validate_ipv4_address
 from django.conf import settings
+from vdiManager.settings import Config
 # Create your models here.
+
+def get_expiry_time():
+    from datetime import datetime,timedelta
+    return datetime.now() + timedelta(days=int(Config.VDI_EXPIRY_DAYS))
 
 class VDIServer(models.Model):
     class Meta:
@@ -65,5 +70,5 @@ class VirtualDesktop(models.Model):
     vd_is_activate = models.BooleanField(blank=False,default=True, verbose_name="فعال")
     vd_created_by = models.CharField(blank=True, max_length=255,verbose_name="ایجاد کننده")
     vd_created_at = models.DateTimeField(blank=False,auto_now_add=True, verbose_name="تاریخ ایجاد")
-    vd_revoked_at = models.DateTimeField(blank=True, verbose_name="تاریخ ابطال")
+    vd_revoked_at = models.DateTimeField(blank=True,default=get_expiry_time(), verbose_name="تاریخ ابطال")
     vd_expired_at = models.DateTimeField(blank=False,auto_now=True, verbose_name="تاریخ انقضا")

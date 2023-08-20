@@ -57,7 +57,7 @@ def adauth_list_info(request):
                                 print("active VD",owner_vd.vd_server)
 
                                 vdi_name=f"{owner_vd.vd_container_name}"
-                                vdi_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}"
+                                vdi_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}/"
                                 vdi_vncpass=f"{owner_vd.vd_container_vncpass}"
                                 vdi_browser_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}/browser"
                                 vdi_browser_user='admin'
@@ -187,7 +187,7 @@ def adauth_list_info(request):
                                                         ,cpu='2'
                                                         ,mem='2g'
                                                         ,volumes={f"{server.data_path}/{vdi_name}/Downloads": {'bind': f"/home/{username}/Downloads", 'mode': 'rw'}}
-                                                        ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}"}
+                                                        ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}"}
                                                         ,network='no-internet'
                                                         ,ip=f"{owner.owner_ip}"
                                                         )
@@ -228,11 +228,11 @@ def adauth_list_info(request):
                                                                                 vd_browser_img=f"{Config.DOCKER_BROWSER_IMAGE}",
                                                                                 vd_browser_name=f"{browser_name}",
                                                                                 vd_is_activate = True,
-                                                                                vd_created_by =f"ad_form-{username}",
+                                                                                vd_created_by =f"LDAP-{username}",
                                                                                 vd_creator_ip=f"{creator_ip}"
                                                                                 )
                                         vdi_name=f"{vdi_name}"
-                                        vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}"
+                                        vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}/"
                                         vdi_vncpass=f"{vnc_pass}"
                                         vdi_browser_url=f"{server.server_scheme}://{server.server_hostname}/{username}/browser"
                                         vdi_browser_user='admin'
@@ -291,7 +291,7 @@ def adauth_list_info(request):
                                 #### VDI is active  profile = 1  - vdi = 1
                                 if owner_vd != None and owner_vd.vd_is_activate ==True:
                                     vdi_name=f"{owner_vd.vd_container_name}"
-                                    vdi_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}"
+                                    vdi_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}/"
                                     vdi_vncpass=f"{owner_vd.vd_container_vncpass}"
                                     vdi_browser_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}/browser"
                                     vdi_browser_user='admin'
@@ -323,7 +323,7 @@ def adauth_list_info(request):
                                                                 ,cpu='2'
                                                                 ,mem='2g'
                                                                 ,volumes={f"{server.data_path}/{vdi_name}/Downloads": {'bind': f"/home/{username}/Downloads", 'mode': 'rw'}}
-                                                                ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}"}
+                                                                ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}"}
                                                                 ,network='no-internet'
                                                                 ,ip=f"{owner.owner_ip}"
                                                                 )
@@ -362,11 +362,11 @@ def adauth_list_info(request):
                                                                                         vd_browser_img=f"{Config.DOCKER_BROWSER_IMAGE}",
                                                                                         vd_browser_name=f"{browser_name}",
                                                                                         vd_is_activate = True,
-                                                                                        vd_created_by =f"ad_form-{username}",
+                                                                                        vd_created_by =f"LDAP-{username}",
                                                                                         vd_creator_ip=f"{creator_ip}"
                                                                                         )
                                                 vdi_name=f"{vdi_name}"
-                                                vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}"
+                                                vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}/"
                                                 vdi_vncpass=f"{vnc_pass}"
                                                 vdi_browser_url=f"{server.server_scheme}://{server.server_hostname}/{username}/browser"
                                                 vdi_browser_user='admin'
@@ -385,6 +385,7 @@ def adauth_list_info(request):
                                                     'vdi_expired_at':f"{vdi_expired_at}",
                                                 }
                                                 nginx_result = update_nginx(server=server,user=f"{username}",vd_container=f"{vdi_name}",fb_container=f"{browser_name}")
+                                                print(nginx_result)
                                                 if int(nginx_result['result']) == 1:
                                                     return render(request, 'adAuth/info.html',context=context)
                                             except Exception as e:
@@ -421,7 +422,7 @@ def adauth_list_info(request):
                                                         ,cpu='2'
                                                         ,mem='2g'
                                                         ,volumes={f"{server.data_path}/{vdi_name}/Downloads": {'bind': f"/home/{username}/Downloads", 'mode': 'rw'}}
-                                                        ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}"}
+                                                        ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}"}
                                                         ,network='no-internet'
                                                         ,ip=container_ip
                                                         )
@@ -469,11 +470,11 @@ def adauth_list_info(request):
                                                                                 vd_browser_img=f"{Config.DOCKER_BROWSER_IMAGE}",
                                                                                 vd_browser_name=f"{browser_name}",
                                                                                 vd_is_activate = True,
-                                                                                vd_created_by =f"ad_form-{username}",
+                                                                                vd_created_by =f"LDAP-{username}",
                                                                                 vd_creator_ip=f"{creator_ip}"
                                                                                 )
                                         vdi_name=f"{vdi_name}"
-                                        vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}"
+                                        vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}/"
                                         vdi_vncpass=f"{vnc_pass}"
                                         vdi_browser_url=f"{server.server_scheme}://{server.server_hostname}/{username}/browser"
                                         vdi_browser_user='admin'
@@ -495,7 +496,7 @@ def adauth_list_info(request):
                                         if int(nginx_result['result']) == 1:
                                             return render(request, 'adAuth/info.html',context=context)
                                     except Exception as e:
-                                        print(e,repr(e),nginx_result)
+                                        print(e,repr(e))
                                         remove_vdi(server,user=[f"{username}"],containers=[container['container_spec']['id'],fb_container['container_spec']['id']],paths=[f"{server.data_path}/{username}-vdi"])
                                         messages.add_message(request,messages.ERROR,e)
                                         return redirect('/')          
@@ -504,7 +505,7 @@ def adauth_list_info(request):
                             return redirect('/')
                         
             except Exception as e:
-                print(repr(e),e,server,container_ip,container)
+                print(repr(e),e)
         else:
             messages.add_message(request,messages.ERROR,f"{form.errors}")
             return redirect('/')
