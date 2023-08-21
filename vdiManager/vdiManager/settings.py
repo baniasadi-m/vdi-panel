@@ -204,3 +204,4 @@ class Config:
     AGENT_JWT_SECRET = environ.get('AGENT_JWT_SECRET')
     AGENT_JWT_ISSUER = environ.get('AGENT_JWT_ISSUER')    
     AGENT_JWT_ALGO = environ.get('AGENT_JWT_ALGO')    
+    VDI_EXPIRY_DAYS = environ.get('VDI_EXPIRY_DAYS','1')    
