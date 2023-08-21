@@ -17,9 +17,9 @@ def jwt_gen_token():
         "exp": current_time + 60,
         "nbf": current_time - 3600,
     }
-    secret = Config.AGENT_JWT_SECRET
+    secret = f"{Config.AGENT_JWT_SECRET}"
 
-    return encode(payload,secret,Config.AGENT_JWT_ALGO)
+    return encode(payload,secret,f"{Config.AGENT_JWT_ALGO}")
 
 
 def gen_password(length=12):
