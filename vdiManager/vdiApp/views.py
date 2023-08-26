@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger,InvalidP
 from django.contrib import messages
 from online_users.models import OnlineUserActivity
 from vdiManager.settings import Config
-from .util import create_container,get_free_ip,get_client_ip, get_current_datetime, get_server, user_allowed, server_status, jwt_gen_token
+from .util import update_nginx,gen_password,create_container,get_free_ip,get_client_ip, get_current_datetime, get_server, user_allowed, server_status, jwt_gen_token
 
 # Main Dashboard
 @login_required(login_url='/accounts/login/')
@@ -51,77 +51,52 @@ def vdcreate(request):
                 temp_form.vd_container_img = Config.DOCKER_DESKTOP_IMAGE
                 server_elec = get_server()
                 temp_form.vd_server = server_elec
-                # temp_form.vd_server.server_ip = get_server()
-                url = f"{temp_form.vd_server.server_scheme}://{temp_form.vd_server.server_ip}:{temp_form.vd_server.server_port}/api/v1/containers"
-                headers={'Content-Type': 'application/json'}
-                jwt_token = jwt_gen_token()
-                headers.update(
-                    {
-                        'jwt': f"{jwt_token}"
-                    }
-                )
-              
-                data = {
-                        'image': f"{temp_form.vd_container_img}",
-                        'name' : f"{temp_form.vd_container_name}",
-                        'cpu' : f"{temp_form.vd_container_cpu}",
-                        'mem' : f"{temp_form.vd_container_mem}",
-                        'volumes' : {f"{temp_form.vd_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/home/{temp_form.vd_container_user}/Downloads", 'mode': 'rw'}},
-                        'env' : {"USER":f"{temp_form.vd_container_user}","PASSWORD":f"{temp_form.vd_container_password}","VNC_PASSWORD":f"{temp_form.vd_container_vncpass}"},
-                        'ports' : ['80'],
-                        # 'ports' : {'80/tcp':int(f"{temp_form.vd_port}")},
-                        }
-                print(data)
-                import requests, json
                 try:
-                    r = requests.post(url=url,data=json.dumps(data),headers=headers,verify=False).json()
-                    print(type(r),r)
-                    response_ports = json.loads(r['container_spec']['host_ports'])
-                    if len(response_ports) > 1:
-                        for i in response_ports:
-                            temp_form.vd_port += f",{str(i)}"
-                    else:
-                        temp_form.vd_port = response_ports[0]
-
-                    # r={'status':'1','container_spec':{'id':"dfcddevfervervvr",'short_id':"fvdfdre"}}
-                    
-                    if int(r['status']) == 1:
-                        temp_form.vd_container_id = r['container_spec']['id']
-                        temp_form.vd_container_shortid = r['container_spec']['short_id']
-                        temp_form.vd_created_by = str(request.user)
-                        temp_form.vd_creator_ip = get_client_ip(request)
-                        temp_form.vd_browser_img = Config.DOCKER_BROWSER_IMAGE 
-                        temp_form.vd_browser_name = temp_form.vd_container_name + '-filebrowser'
-                        data = {
-                                'image': f"{temp_form.vd_browser_img}",
-                                'name' : f"{temp_form.vd_browser_name}",
-                                'cpu' : "2",
-                                'mem' : "1g",
-                                'volumes' : {f"{temp_form.vd_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/srv", 'mode': 'ro'}},
-                                'env' : {"USER":"vdi"},
-                                'ports' : ['80'],
-                                # 'ports' : {'80/tcp':int(f"{temp_form.vd_browser_port}")},
-                                }
-                        r = requests.post(url=url,data=json.dumps(data),headers=headers,verify=False).json()
-                        print(r)
-                        if int(r['status']) == 1:
-                            temp_form.vd_browser_id = r['container_spec']['id']
-                            response_ports = json.loads(r['container_spec']['host_ports'])
-                            if len(response_ports) > 1:
-                                for i in response_ports:
-                                    temp_form.vd_browser_port += f",{str(i)}"
+                    container = create_container(server=server_elec,image=f"{Config.DOCKER_DESKTOP_IMAGE}"
+                                ,name=f"{temp_form.vd_owner.owner_user}-vdi"
+                                ,cpu=f"{temp_form.vd_container_cpu}"
+                                ,mem=f"{temp_form.vd_container_mem}"
+                                ,volumes={f"{temp_form.vd_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/home/{temp_form.vd_container_user}/Downloads", 'mode': 'rw'}}
+                                ,env={"USER":f"{temp_form.vd_container_user}","PASSWORD":f"{temp_form.vd_container_password}","VNC_PASSWORD":f"{temp_form.vd_container_vncpass}","RELATIVE_URL_ROOT":f"{temp_form.vd_owner.owner_user}","HTTP_PROXY":f"{temp_form.vd_owner.owner_user}:{temp_form.vd_owner.owner_password}@172.20.0.2:3128","HTTPS_PROXY":f"{temp_form.vd_owner.owner_user}:{temp_form.vd_owner.owner_password}@172.20.0.2:3128"}
+                                ,network='no-internet'
+                                ,ip=f"{temp_form.vd_owner.owner_ip}"
+                                )
+                    if int(container['result']) == 1:
+                            temp_form.vd_container_id = container['container_spec']['id']
+                            temp_form.vd_container_shortid = container['container_spec']['short_id']
+                            temp_form.vd_created_by = str(request.user)
+                            temp_form.vd_creator_ip = get_client_ip(request)
+                            temp_form.vd_browser_img = Config.DOCKER_BROWSER_IMAGE 
+                            temp_form.vd_browser_name = f"{temp_form.vd_owner.owner_user}-filebrowser"
+                            fb_password = gen_password()
+                            fb_container = create_container(server=server_elec,image=f"{Config.DOCKER_BROWSER_IMAGE}"
+                                                    ,name=f"{temp_form.vd_owner.owner_user}-filebrowser"
+                                                    ,cpu='1'
+                                                    ,mem='1g'
+                                                    ,volumes={f"{server_elec.data_path}/{temp_form.vd_owner.owner_user}-vdi/Downloads": {'bind': f"/srv", 'mode': 'ro'}}
+                                                    ,env={"FBUSER":f"{temp_form.vd_owner.owner_user}","FBPASSWORD":f"{fb_password}","BASEURL":f"/{temp_form.vd_owner.owner_user}/fbrowser"}
+                                                    ,network='no-internet'
+                                                    ,ip=f"{temp_form.vd_owner.owner_browser_ip}"
+                                                    )
+                            if int(fb_container['result']) == 1:
+                                nginx_result = update_nginx(server=server_elec,user=f"{temp_form.vd_owner.owner_user}",vd_container=f"{temp_form.vd_owner.owner_user}-vdi",fb_container=f"{temp_form.vd_owner.owner_user}-filebrowser")
+                                if int(nginx_result['result']) == 1:
+                                    temp_form.vd_owner.owner_vd_created_number += 1
+                                    temp_form.vd_owner.save()
+                                    temp_form.save()
+                                    messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
+                                    return redirect(f"/vdinfo/{temp_form.vd_container_shortid}")
+                                else:
+                                    messages.add_message(request,messages.ERROR,'nginx update error')
+                                    return redirect('/vdcreate')          
                             else:
-                                temp_form.vd_browser_port = response_ports[0]
-                            temp_form.save()
-                            messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
-                            return redirect(f"/vdinfo/{temp_form.vd_container_shortid}")
-                        else:
-                            messages.add_message(request,messages.ERROR,'API Status error')
-                            return redirect('/vdcreate')
+                                messages.add_message(request,messages.ERROR,'API Status error')
+                                return redirect('/vdcreate')
                 except Exception as e:
                     print(e)
                     messages.add_message(request,messages.ERROR,'API error')
                     return redirect('/vdcreate')
+           
 
         form=CreateVirtualDesktop()
         username =request.user.get_user_permissions()
