@@ -94,7 +94,7 @@ def adauth_list_info(request):
                                                         ,cpu='2'
                                                         ,mem='2g'
                                                         ,volumes={f"{server.data_path}/{vdi_name}/Downloads": {'bind': f"/home/{username}/Downloads", 'mode': 'rw'}}
-                                                        ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}"}
+                                                        ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}","HTTP_PROXY":f"{username}:{password}@172.20.0.2:3128","HTTPS_PROXY":f"{username}:{password}@172.20.0.2:3128"}
                                                         ,network='no-internet'
                                                         ,ip=f"{owner.owner_ip}"
                                                         )
@@ -230,7 +230,7 @@ def adauth_list_info(request):
                                                                 ,cpu='2'
                                                                 ,mem='2g'
                                                                 ,volumes={f"{server.data_path}/{vdi_name}/Downloads": {'bind': f"/home/{username}/Downloads", 'mode': 'rw'}}
-                                                                ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}"}
+                                                                ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}","HTTP_PROXY":f"{username}:{password}@172.20.0.2:3128","HTTPS_PROXY":f"{username}:{password}@172.20.0.2:3128"}
                                                                 ,network='no-internet'
                                                                 ,ip=f"{owner.owner_ip}"
                                                                 )
@@ -328,7 +328,7 @@ def adauth_list_info(request):
                                                         ,cpu='2'
                                                         ,mem='2g'
                                                         ,volumes={f"{server.data_path}/{vdi_name}/Downloads": {'bind': f"/home/{username}/Downloads", 'mode': 'rw'}}
-                                                        ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}"}
+                                                        ,env={"USER":f"{username}","PASSWORD":f"{password}aqr","VNC_PASSWORD":f"{vnc_pass}","RELATIVE_URL_ROOT":f"{username}","HTTP_PROXY":f"{username}:{password}@172.20.0.2:3128","HTTPS_PROXY":f"{username}:{password}@172.20.0.2:3128"}
                                                         ,network='no-internet'
                                                         ,ip=container_ip
                                                         )

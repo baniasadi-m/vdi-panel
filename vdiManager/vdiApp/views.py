@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger,InvalidP
 from django.contrib import messages
 from online_users.models import OnlineUserActivity
 from vdiManager.settings import Config
-from .util import get_client_ip, get_current_datetime, get_server, user_allowed, server_status, jwt_gen_token
+from .util import create_container,get_free_ip,get_client_ip, get_current_datetime, get_server, user_allowed, server_status, jwt_gen_token
 
 # Main Dashboard
 @login_required(login_url='/accounts/login/')
@@ -265,10 +265,69 @@ def profile_create(request):
                 if 'is_ldap' in request.POST:
                     tmp_form.owner_create_by_ldap =True
                 else:
-                    tmp_form.owner_create_by_ldap =False    
-                tmp_form.save()
-                messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
-                return redirect(f"/profileinfo/{tmp_form.owner_user}")        
+                    tmp_form.owner_create_by_ldap =False   
+                server = get_server()
+                container_ip = get_free_ip(server=server)
+                import re 
+                ip_pattern = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+                container1 = create_container(server,image=f"{Config.DOCKER_BROWSER_IMAGE}"
+                                            ,name=f"temp_container1"
+                                            ,cpu='1'
+                                            ,mem='1g'
+                                            ,network='no-internet'
+                                            ,volumes={f"{server.data_path}/temp1/Downloads": {'bind': f"/srv", 'mode': 'rw'}}
+                                            ,env={"FBUSER":f"fgddf","FBPASSWORD":f"sdffdfs","BASEURL":f"/sdasdsa/fbrowser"}
+                                            ,ip=container_ip)
+                print(container1)
+                
+                tmp_form.owner_ip = ip_pattern.search(container1['container_spec']['ip'])[0]
+                container_ip = get_free_ip(server=server)
+                container2 = create_container(server,image=f"{Config.DOCKER_BROWSER_IMAGE}"
+                                            ,name=f"temp_container2"
+                                            ,cpu='1'
+                                            ,mem='1g'
+                                            ,network='no-internet'
+                                            ,volumes={f"{server.data_path}/temp1/Downloads": {'bind': f"/srv", 'mode': 'rw'}}
+                                            ,env={"FBUSER":f"fgddf","FBPASSWORD":f"sdffdfs","BASEURL":f"/sdasdsa/fbrowser"}
+                                            ,ip=container_ip
+                                            )
+                # data_paths = []
+                # data_paths.append
+                tmp_form.owner_browser_ip = ip_pattern.search(container2['container_spec']['ip'])[0]
+                import requests,json
+                url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/containers"
+                try:
+                    containers_ids = []
+                    containers_ids.append(container1['container_spec']['id'])
+                    containers_ids.append(container2['container_spec']['id'])
+                    data = {'path':list([1]),'ids': list([2]),'user':'jjjj'}
+                    headers={'Content-Type': 'application/json'}
+                    jwt_token = jwt_gen_token()
+                    headers.update(
+                        {
+                            'jwt': f"{jwt_token}"
+                        }
+                    )
+
+                    for i in containers_ids:
+                        new_url = url + f"/{i}"
+                        print(new_url)
+                        r = requests.delete(url=new_url,headers=headers,verify=False).json()
+                        print(r)
+                    data = {
+                        "username" : f"{tmp_form.owner_user}",
+                        "password" : f"{tmp_form.owner_password}"
+                    }
+                    url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/squidupdate"
+                    r = r = requests.post(url=url,headers=headers,data=json.dumps(data),verify=False).json()
+                    if int(r['status']) == 1 :
+                        tmp_form.save()
+                        messages.add_message(request,messages.SUCCESS,'پروفایل ایجاد شد')
+                        return redirect(f"/profileinfo/{tmp_form.owner_user}")    
+                    else:
+                        messages.add_message(request,messages.WARNING,'خطا در ایجاد پروفایل')
+                except Exception as e:
+                    print("exception",e)    
         form=CreateProfile()
         v=""
         print(v)

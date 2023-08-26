@@ -23,4 +23,4 @@ class CreateVirtualDesktop(forms.ModelForm):
 class CreateProfile(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['owner_name','owner_user','owner_password','owner_ip','owner_browser_ip','owner_description','owner_create_by_ldap','owner_is_active']
+        fields = ['owner_name','owner_user','owner_password','owner_description','owner_create_by_ldap','owner_is_active']
