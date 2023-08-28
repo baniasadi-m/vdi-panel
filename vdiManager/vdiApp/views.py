@@ -61,14 +61,18 @@ def vdcreate(request):
                                 ,network='no-internet'
                                 ,ip=f"{temp_form.vd_owner.owner_ip}"
                                 )
+                    
                     if int(container['result']) == 1:
                             temp_form.vd_container_id = container['container_spec']['id']
-                            temp_form.vd_container_shortid = container['container_spec']['short_id']
+                            temp_form.vd_container_shortid = container['container_spec']['shortid']
                             temp_form.vd_created_by = str(request.user)
                             temp_form.vd_creator_ip = get_client_ip(request)
                             temp_form.vd_browser_img = Config.DOCKER_BROWSER_IMAGE 
                             temp_form.vd_browser_name = f"{temp_form.vd_owner.owner_user}-filebrowser"
+                            temp_form.vd_container_user = temp_form.vd_owner.owner_user
+                            temp_form.vd_container_password = gen_password()
                             fb_password = gen_password()
+                            temp_form.vd_browser_pass = fb_password
                             fb_container = create_container(server=server_elec,image=f"{Config.DOCKER_BROWSER_IMAGE}"
                                                     ,name=f"{temp_form.vd_owner.owner_user}-filebrowser"
                                                     ,cpu='1'
@@ -79,6 +83,7 @@ def vdcreate(request):
                                                     ,ip=f"{temp_form.vd_owner.owner_browser_ip}"
                                                     )
                             if int(fb_container['result']) == 1:
+                                temp_form.vd_browser_id = fb_container['container_spec']['id']
                                 nginx_result = update_nginx(server=server_elec,user=f"{temp_form.vd_owner.owner_user}",vd_container=f"{temp_form.vd_owner.owner_user}-vdi",fb_container=f"{temp_form.vd_owner.owner_user}-filebrowser")
                                 if int(nginx_result['result']) == 1:
                                     temp_form.vd_owner.owner_vd_created_number += 1
@@ -224,7 +229,39 @@ def server_info(request,info_id):
     context = {'server': server,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
     return render(request, 'vdiApp/serverinfo.html',context=context)
 
-
+# Remove profile
+@login_required(login_url='/accounts/login/')
+def profile_remove(request,profile_id):
+    print(profile_id)
+    try:
+        profile = UserProfile.objects.get(owner_user=profile_id)
+        data = {
+            "username" : f"{profile.owner_user}",
+            "password" : f"{profile.owner_password}"
+        }
+        headers={'Content-Type': 'application/json'}
+        jwt_token = jwt_gen_token()
+        headers.update(
+            {
+                'jwt': f"{jwt_token}"
+            }
+        )
+        servers = VDIServer.objects.all()
+        import requests,json
+        for server in servers:
+            url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/squidupdate"
+            requests.delete(url=url,headers=headers,data=json.dumps(data),verify=False).json()
+            
+        profile.delete()
+        context = {'profile':profile,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+        messages.add_message(request,messages.SUCCESS,'پروفایل با مشخصات ذیل حذف شد')
+        return render(request, 'vdiApp/profileremove.html',context=context)
+          
+    except Exception as e:
+        print(e)
+        messages.add_message(request,messages.WARNING,'مشکلی در حذف پروفایل رخ داده است')
+        return redirect('/dashboard')
+    
 @login_required(login_url='/accounts/login/')
 def profile_create(request):
     if user_allowed(request,usergroup=['vdadmin']):
@@ -233,15 +270,9 @@ def profile_create(request):
             print("PROFILE")
             if form.is_valid():
                 tmp_form = form.save(commit=False)
-                if 'is_active' in request.POST:
-                    tmp_form.owner_is_active =True
-                else:
-                    tmp_form.owner_is_active =False
-                if 'is_ldap' in request.POST:
-                    tmp_form.owner_create_by_ldap =True
-                else:
-                    tmp_form.owner_create_by_ldap =False   
+                print(tmp_form)
                 server = get_server()
+                print(server)
                 container_ip = get_free_ip(server=server)
                 import re 
                 ip_pattern = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
@@ -294,12 +325,14 @@ def profile_create(request):
                         "password" : f"{tmp_form.owner_password}"
                     }
                     url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/squidupdate"
-                    r = r = requests.post(url=url,headers=headers,data=json.dumps(data),verify=False).json()
+                    r  = requests.post(url=url,headers=headers,data=json.dumps(data),verify=False).json()
+                    print(url, r)
                     if int(r['status']) == 1 :
                         tmp_form.save()
                         messages.add_message(request,messages.SUCCESS,'پروفایل ایجاد شد')
                         return redirect(f"/profileinfo/{tmp_form.owner_user}")    
                     else:
+
                         messages.add_message(request,messages.WARNING,'خطا در ایجاد پروفایل')
                 except Exception as e:
                     print("exception",e)    
@@ -386,20 +419,6 @@ def profile_edit(request,profile_id= None):
             context = {'form':form,'profile_id':profile.owner_user,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
             
             return  render(request,'vdiApp/profileedit.html',context=context)
-# Remove profile
-@login_required(login_url='/accounts/login/')
-def profile_remove(request,profile_id):
-    print(profile_id)
-    try:
-        profile = UserProfile.objects.get(owner_user=profile_id)
-        profile.delete()
-        context = {'profile':profile,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
-        messages.add_message(request,messages.SUCCESS,'پروفایل با مشخصات ذیل حذف شد')
-        return render(request, 'vdiApp/profileremove.html',context=context)
-          
-    except Exception as e:
-        print(e)
-        messages.add_message(request,messages.WARNING,'مشکلی در حذف پروفایل رخ داده است')
-        return redirect('/dashboard')
+
 
 

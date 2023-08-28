@@ -134,7 +134,7 @@ def adauth_list_info(request):
                                                                                 vd_browser_img=f"{Config.DOCKER_BROWSER_IMAGE}",
                                                                                 vd_browser_name=f"{browser_name}",
                                                                                 vd_is_activate = True,
-                                                                                vd_created_by =f"LDAP-{username}",
+                                                                                vd_created_by =f"LOCAL-{username}",
                                                                                 vd_creator_ip=f"{creator_ip}"
                                                                                 )
                                         vdi_name=f"{vdi_name}"
