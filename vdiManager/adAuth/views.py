@@ -54,12 +54,12 @@ def adauth_list_info(request):
                         if owner_vd != None:
                             if owner_vd.vd_is_activate == True:
 
-                                print("active VD",owner_vd.vd_server)
+                                print("active VD",owner_vd.vd_owner.owner_server)
 
                                 vdi_name=f"{owner_vd.vd_container_name}"
-                                vdi_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}/"
+                                vdi_url=f"{owner_vd.vd_owner.owner_server.server_scheme}://{owner_vd.vd_owner.owner_server.server_hostname}/{username}/"
                                 vdi_vncpass=f"{owner_vd.vd_container_vncpass}"
-                                vdi_browser_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}/browser"
+                                vdi_browser_url=f"{owner_vd.vd_owner.owner_server.server_scheme}://{owner_vd.vd_owner.owner_server.server_hostname}/{username}/browser"
                                 vdi_browser_user=f"{username}"
                                 vdi_browser_pass=f"{owner_vd.vd_browser_pass}"
                                 vdi_created_at= owner_vd.vd_created_at
@@ -86,7 +86,8 @@ def adauth_list_info(request):
                             
                             creator_ip = get_client_ip(request)
                             print("DEBUG THIS:",vdi_name,browser_name,vnc_pass,creator_ip)
-                            server = get_server()
+                            # server = get_server()
+                            server = owner.owner_server
                             print("VDI")
                             
                             container = create_container(server,image=f"{Config.DOCKER_DESKTOP_IMAGE}"
@@ -118,7 +119,6 @@ def adauth_list_info(request):
                                         owner.owner_vd_created_number += 1
                                         owner.save() 
                                         vdi_model = VirtualDesktop.objects.create(vd_container_name=f"{vdi_name}",
-                                                                                vd_server=server,
                                                                                 vd_container_cpu='2',
                                                                                 vd_container_mem='2g',
                                                                                 vd_container_img=Config.DOCKER_DESKTOP_IMAGE,
@@ -135,7 +135,8 @@ def adauth_list_info(request):
                                                                                 vd_browser_name=f"{browser_name}",
                                                                                 vd_is_activate = True,
                                                                                 vd_created_by =f"LOCAL-{username}",
-                                                                                vd_creator_ip=f"{creator_ip}"
+                                                                                vd_creator_ip=f"{creator_ip}",
+                                                                                vd_expired_at = get_expiry_time()
                                                                                 )
                                         vdi_name=f"{vdi_name}"
                                         vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}/"
@@ -198,9 +199,9 @@ def adauth_list_info(request):
                                 #### VDI is active  profile = 1  - vdi = 1
                                 if owner_vd != None and owner_vd.vd_is_activate ==True:
                                     vdi_name=f"{owner_vd.vd_container_name}"
-                                    vdi_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}/"
+                                    vdi_url=f"{owner_vd.vd_owner.owner_server.server_scheme}://{owner_vd.vd_owner.owner_server.server_hostname}/{username}/"
                                     vdi_vncpass=f"{owner_vd.vd_container_vncpass}"
-                                    vdi_browser_url=f"{owner_vd.vd_server.server_scheme}://{owner_vd.vd_server.server_hostname}/{username}/fbrowser"
+                                    vdi_browser_url=f"{owner_vd.vd_owner.owner_server.server_scheme}://{owner_vd.vd_owner.owner_server.server_hostname}/{username}/fbrowser"
                                     vdi_browser_user=f"{owner.owner_user}"
                                     vdi_browser_pass=f"{owner_vd.vd_browser_pass}"
                                     vdi_created_at= owner_vd.vd_created_at
@@ -224,7 +225,8 @@ def adauth_list_info(request):
                                     browser_name = f"{username}-filebrowser"
                                     vnc_pass = gen_password()
                                     creator_ip = get_client_ip(request)
-                                    server = get_server()
+                                    # server = get_server()
+                                    server = owner.owner_server
                                     container = create_container(server,image=f"{Config.DOCKER_DESKTOP_IMAGE}"
                                                                 ,name=f"{vdi_name}"
                                                                 ,cpu='2'
@@ -252,7 +254,6 @@ def adauth_list_info(request):
                                                 owner.owner_vd_created_number += 1
                                                 owner.save() 
                                                 vdi_model = VirtualDesktop.objects.create(vd_container_name=f"{vdi_name}",
-                                                                                        vd_server=server,
                                                                                         vd_container_cpu='2',
                                                                                         vd_container_mem='2g',
                                                                                         vd_container_img=Config.DOCKER_DESKTOP_IMAGE,
@@ -269,7 +270,8 @@ def adauth_list_info(request):
                                                                                         vd_browser_name=f"{browser_name}",
                                                                                         vd_is_activate = True,
                                                                                         vd_created_by =f"LDAP-{username}",
-                                                                                        vd_creator_ip=f"{creator_ip}"
+                                                                                        vd_creator_ip=f"{creator_ip}",
+                                                                                        vd_expired_at = get_expiry_time()
                                                                                         )
                                                 vdi_name=f"{vdi_name}" 
                                                 vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}/"
@@ -304,12 +306,13 @@ def adauth_list_info(request):
                             
                             #### create profile and vdi
                             try:
-                                
+                                server = get_server()
                                 new_profile = UserProfile.objects.create(
                         
                                     owner_name=username,
                                     owner_user=username,
                                     owner_password=password,
+                                    owner_server=server,
                                     owner_create_by_ldap=True,
                                 )
                                 print("NEW PROFILE:",new_profile)
@@ -321,7 +324,6 @@ def adauth_list_info(request):
                             browser_name = f"{username}-filebrowser"
                             vnc_pass = gen_password()
                             creator_ip = get_client_ip(request)
-                            server = get_server()
                             container_ip = get_free_ip(server=server)
                             container = create_container(server,image=f"{Config.DOCKER_DESKTOP_IMAGE}"
                                                         ,name=f"{vdi_name}"
@@ -359,7 +361,6 @@ def adauth_list_info(request):
                                         # new_profile.owner_updated_at = datetime.now()
                                         new_profile.save() 
                                         vdi_model = VirtualDesktop.objects.create(vd_container_name=f"{vdi_name}",
-                                                                                vd_server=server,
                                                                                 vd_container_cpu='2',
                                                                                 vd_container_mem='2g',
                                                                                 vd_container_img=Config.DOCKER_DESKTOP_IMAGE,
@@ -376,7 +377,8 @@ def adauth_list_info(request):
                                                                                 vd_browser_name=f"{browser_name}",
                                                                                 vd_is_activate = True,
                                                                                 vd_created_by =f"LDAP-{username}",
-                                                                                vd_creator_ip=f"{creator_ip}"
+                                                                                vd_creator_ip=f"{creator_ip}",
+                                                                                vd_expired_at = get_expiry_time()
                                                                                 )
                                         vdi_name=f"{vdi_name}"
                                         vdi_url=f"{server.server_scheme}://{server.server_hostname}/{username}/"

@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger,InvalidP
 from django.contrib import messages
 from online_users.models import OnlineUserActivity
 from vdiManager.settings import Config
-from .util import update_nginx,gen_password,create_container,get_free_ip,get_client_ip, get_current_datetime, get_server, user_allowed, server_status, jwt_gen_token
+from .util import *
 
 # Main Dashboard
 @login_required(login_url='/accounts/login/')
@@ -50,13 +50,13 @@ def vdcreate(request):
                 temp_form.vd_container_mem = request.POST['vd_container_mem']
                 temp_form.vd_container_img = Config.DOCKER_DESKTOP_IMAGE
                 server_elec = get_server()
-                temp_form.vd_server = server_elec
+                temp_form.vd_owner.owner_server = server_elec
                 try:
                     container = create_container(server=server_elec,image=f"{Config.DOCKER_DESKTOP_IMAGE}"
                                 ,name=f"{temp_form.vd_owner.owner_user}-vdi"
                                 ,cpu=f"{temp_form.vd_container_cpu}"
                                 ,mem=f"{temp_form.vd_container_mem}"
-                                ,volumes={f"{temp_form.vd_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/home/{temp_form.vd_container_user}/Downloads", 'mode': 'rw'}}
+                                ,volumes={f"{temp_form.vd_owner.owner_server.data_path}/{temp_form.vd_container_name}/Downloads": {'bind': f"/home/{temp_form.vd_container_user}/Downloads", 'mode': 'rw'}}
                                 ,env={"USER":f"{temp_form.vd_container_user}","PASSWORD":f"{temp_form.vd_container_password}","VNC_PASSWORD":f"{temp_form.vd_container_vncpass}","RELATIVE_URL_ROOT":f"{temp_form.vd_owner.owner_user}","HTTP_PROXY":f"{temp_form.vd_owner.owner_user}:{temp_form.vd_owner.owner_password}@172.20.0.2:3128","HTTPS_PROXY":f"{temp_form.vd_owner.owner_user}:{temp_form.vd_owner.owner_password}@172.20.0.2:3128"}
                                 ,network='no-internet'
                                 ,ip=f"{temp_form.vd_owner.owner_ip}"
@@ -87,6 +87,7 @@ def vdcreate(request):
                                 nginx_result = update_nginx(server=server_elec,user=f"{temp_form.vd_owner.owner_user}",vd_container=f"{temp_form.vd_owner.owner_user}-vdi",fb_container=f"{temp_form.vd_owner.owner_user}-filebrowser")
                                 if int(nginx_result['result']) == 1:
                                     temp_form.vd_owner.owner_vd_created_number += 1
+                                    temp_form.vd_expired_at = get_expiry_time()
                                     temp_form.vd_owner.save()
                                     temp_form.save()
                                     messages.add_message(request,messages.SUCCESS,'میزکار ایجاد شد')
@@ -122,12 +123,12 @@ def vdremove(request,vd_id):
     data_paths = []
     container_ids.append(vd.vd_container_id)
     container_ids.append(vd.vd_browser_id)
-    data_paths.append(f"{vd.vd_server.data_path}/{vd.vd_container_name}")
+    data_paths.append(f"{vd.vd_owner.owner_server.data_path}/{vd.vd_container_name}")
     users=[]
     users.append(vd.vd_owner.owner_user)
     print(users)
     import requests,json
-    url = f"{vd.vd_server.server_scheme}://{vd.vd_server.server_ip}:{vd.vd_server.server_port}/api/v1/containers"
+    url = f"{vd.vd_owner.owner_server.server_scheme}://{vd.vd_owner.owner_server.server_ip}:{vd.vd_owner.owner_server.server_port}/api/v1/containers"
     try:
         data = {'path':list(data_paths),'ids': list(container_ids),'user':users}
         headers={'Content-Type': 'application/json'}
@@ -246,17 +247,41 @@ def profile_remove(request,profile_id):
                 'jwt': f"{jwt_token}"
             }
         )
-        servers = VDIServer.objects.all()
+        server = profile.owner_server
         import requests,json
-        for server in servers:
-            url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/squidupdate"
-            requests.delete(url=url,headers=headers,data=json.dumps(data),verify=False).json()
-            
-        profile.delete()
-        context = {'profile':profile,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
-        messages.add_message(request,messages.SUCCESS,'پروفایل با مشخصات ذیل حذف شد')
-        return render(request, 'vdiApp/profileremove.html',context=context)
-          
+        
+        url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/squidupdate"
+        requests.delete(url=url,headers=headers,data=json.dumps(data),verify=False).json()
+
+        vd = VirtualDesktop.objects.get(vd_owner=profile,vd_is_activate=True)
+        container_ids = []
+        data_paths = []
+        container_ids.append(vd.vd_container_id)
+        container_ids.append(vd.vd_browser_id)
+        data_paths.append(f"{vd.vd_owner.owner_server.data_path}/{vd.vd_container_name}")
+        users=[]
+        users.append(vd.vd_owner.owner_user)
+        print(users)
+        import requests,json
+        url = f"{vd.vd_owner.owner_server.server_scheme}://{vd.vd_owner.owner_server.server_ip}:{vd.vd_owner.owner_server.server_port}/api/v1/containers"
+        try:
+            data = {'path':list(data_paths),'ids': list(container_ids),'user':users}
+            r = requests.delete(url=url,headers=headers,data=json.dumps(data),verify=False).json()
+            if int(r['status']) == 1:
+                profile.delete()
+                context = {'profile':profile,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
+                messages.add_message(request,messages.SUCCESS,'پروفایل با مشخصات ذیل حذف شد')
+                return render(request, 'vdiApp/profileremove.html',context=context)
+
+            else:
+                messages.add_message(request,messages.WARNING,'حذف میزکار دچار مشکل شده ')
+                return redirect('/dashboard')
+
+        except Exception as e:
+            print(e)
+            messages.add_message(request,messages.WARNING,'مشکلی در حذف میزکار  رخ داده است')
+            return redirect('/dashboard')
+     
     except Exception as e:
         print(e)
         messages.add_message(request,messages.WARNING,'مشکلی در حذف پروفایل رخ داده است')
@@ -271,9 +296,14 @@ def profile_create(request):
             if form.is_valid():
                 tmp_form = form.save(commit=False)
                 print(tmp_form)
-                server = get_server()
-                print(server)
+                server = tmp_form.owner_server
+                # print(server)
                 container_ip = get_free_ip(server=server)
+                # print(container_ip)
+                if container_ip == False:
+                    return HttpResponse("free ip error")
+                print(container_ip)
+
                 import re 
                 ip_pattern = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
                 container1 = create_container(server,image=f"{Config.DOCKER_BROWSER_IMAGE}"
@@ -288,6 +318,8 @@ def profile_create(request):
                 
                 tmp_form.owner_ip = ip_pattern.search(container1['container_spec']['ip'])[0]
                 container_ip = get_free_ip(server=server)
+                if container_ip == False:
+                    return HttpResponse("free ip error")
                 container2 = create_container(server,image=f"{Config.DOCKER_BROWSER_IMAGE}"
                                             ,name=f"temp_container2"
                                             ,cpu='1'
@@ -324,7 +356,9 @@ def profile_create(request):
                         "username" : f"{tmp_form.owner_user}",
                         "password" : f"{tmp_form.owner_password}"
                     }
+                    print(data)
                     url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/squidupdate"
+                    print(url)
                     r  = requests.post(url=url,headers=headers,data=json.dumps(data),verify=False).json()
                     print(url, r)
                     if int(r['status']) == 1 :

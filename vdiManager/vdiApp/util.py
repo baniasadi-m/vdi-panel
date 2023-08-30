@@ -111,9 +111,28 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+def get_expiry_time():
+    from datetime import datetime,timedelta
+    return datetime.now() + timedelta(days=int(Config.VDI_EXPIRY_DAYS))
+
 def get_free_ip(server):
-    import requests
+    import requests,json
+    profiles = UserProfile.objects.filter(owner_server=server)
+    print(len(profiles))
+    leased_ips = []
+    for profile in profiles:
+        leased_ips.append(
+            profile.owner_ip
+        )
+        leased_ips.append(
+            profile.owner_browser_ip
+        )
+    print("leased ips",leased_ips)
     headers={'Content-Type': 'application/json'}
+    data ={
+        'ips': list(leased_ips)
+    }
+    print(data)
     url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/getip"
     jwt_token = jwt_gen_token()
     headers.update(
@@ -122,7 +141,7 @@ def get_free_ip(server):
         }
     )
     try:
-        r = requests.get(url=url,headers=headers,verify=False,timeout=20).json()
+        r = requests.post(url=url,headers=headers,data=json.dumps(data),verify=False,timeout=200).json()
         print(r)
         if int(r['result']) == 1:
             return r['free_ip']

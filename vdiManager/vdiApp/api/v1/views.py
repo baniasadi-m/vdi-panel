@@ -1,9 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import VDISerializer,VDIPostSerializer
-from ...models import VirtualDesktop,VDIServer
+from .serializers import VDISerializer,VDIPostSerializer,ServerSerializer,ProfileSerializer
+from ...models import VirtualDesktop,VDIServer,UserProfile
 from vdiManager.settings import Config
+from django.forms.models import model_to_dict
 from ...util import get_client_ip, get_server, jwt_gen_token
 
 from django.shortcuts import get_object_or_404
@@ -103,3 +104,90 @@ def api_vdesktops(request,id=None):
         serializer.save()
         return Response(serializer.data)
 
+
+
+@api_view(['GET','POST','DELETE','PUT'])
+def api_servers(request,id=None):
+    if request.method == 'GET' and id==None:
+        try:
+            vds = VDIServer.objects.all()
+            serializer = ServerSerializer(vds,many=True)
+            # print(get_client_ip(request))
+            return Response(serializer.data)
+        except VirtualDesktop.DoesNotExist:
+            return Response({"detaile":"Not Found"},status=status.HTTP_404_NOT_FOUND)
+    elif request.method == 'GET' and id != None:
+        vd = get_object_or_404(VDIServer, server_name=id)
+        serializer = ServerSerializer(vd)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        if id != None:
+            return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
+        mydata = request.data
+        print(mydata)
+        serializer = ServerSerializer(data=mydata)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+       
+    elif request.method == 'PUT':
+        if id == None:
+            return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
+        mydata = request.data
+        server = get_object_or_404(VDIServer, server_name=id)
+
+        serializer = ServerSerializer(instance=server,data=mydata, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        if id == None:
+            return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
+        vd = get_object_or_404(VDIServer, server_name=id)
+        serializer = ServerSerializer(vd)
+        vd.delete()
+        return Response(serializer.data)
+
+
+
+
+@api_view(['GET','POST','DELETE','PUT'])
+def api_profiles(request,id=None):
+    if request.method == 'GET' and id==None:
+        try:
+            vds = UserProfile.objects.all()
+            serializer = ProfileSerializer(vds,many=True)
+            return Response(serializer.data)
+        except VirtualDesktop.DoesNotExist:
+            return Response({"detaile":"Not Found"},status=status.HTTP_404_NOT_FOUND)
+    elif request.method == 'GET' and id != None:
+        vd = get_object_or_404(UserProfile, owner_user=id)
+        serializer = ProfileSerializer(vd)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        if id != None:
+            return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
+        mydata = request.data
+        print(mydata)
+        serializer = ProfileSerializer(data=mydata)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+       
+    elif request.method == 'PUT':
+        if id == None:
+            return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
+        mydata = request.data
+        profile = get_object_or_404(UserProfile, server_name=id)
+
+        serializer = ServerSerializer(instance=profile,data=mydata, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        if id == None:
+            return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
+        vd = get_object_or_404(UserProfile, server_name=id)
+        serializer = ProfileSerializer(vd)
+        vd.delete()
+        return Response(serializer.data)

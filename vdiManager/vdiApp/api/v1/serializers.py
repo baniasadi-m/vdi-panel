@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ...models import VirtualDesktop,VDIServer
+from ...models import VirtualDesktop,VDIServer,UserProfile
 
 class VDISerializer(serializers.ModelSerializer):
     server_ip = serializers.CharField(source='vd_server.server_ip',read_only=True)
@@ -12,9 +12,14 @@ class VDISerializer(serializers.ModelSerializer):
 class ServerSerializer(serializers.ModelSerializer):
     class Meta:
         model = VDIServer
-        fields= ['id','server_name','server_ip','data_path','server_port','server_scheme']
+        fields= ['id','server_name','server_ip','data_path','server_port','server_scheme','server_hostname','is_enabled','description']
 
-
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['id','owner_name','owner_user','owner_password','owner_ip','owner_browser_ip',
+                  'owner_vd_created_number','owner_description','owner_create_by_ldap',
+                  'owner_is_active','owner_created_at','owner_updated_at']
 
 class VDIPostSerializer(serializers.ModelSerializer):
     vd_server = ServerSerializer()
