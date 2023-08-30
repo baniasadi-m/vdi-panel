@@ -74,6 +74,8 @@ def get_server():
     import requests
     min_load = 500.00
     servers = VDIServer.objects.all()
+    if len(servers) == 1:
+        return servers[0]
     # print(type(servers),servers)
     headers={'Content-Type': 'application/json'}
     jwt_token = jwt_gen_token()
