@@ -166,7 +166,7 @@ def api_profiles(request,id=None):
         return Response(serializer.data)
     elif request.method == 'POST':
         if id != None:
-            return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
+            return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)       
         mydata = request.data
         print(mydata)
         serializer = ProfileSerializer(data=mydata)

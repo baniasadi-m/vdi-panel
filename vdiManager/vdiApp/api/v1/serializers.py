@@ -17,9 +17,10 @@ class ServerSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['id','owner_name','owner_user','owner_password','owner_ip','owner_browser_ip',
+        fields = ['id','owner_name','owner_user','owner_password','owner_server','owner_ip','owner_browser_ip',
                   'owner_vd_created_number','owner_description','owner_create_by_ldap',
                   'owner_is_active','owner_created_at','owner_updated_at']
+
 
 class VDIPostSerializer(serializers.ModelSerializer):
     vd_server = ServerSerializer()

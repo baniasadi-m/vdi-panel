@@ -402,7 +402,7 @@ def profile_info(request,info_id):
             print(f"profile info exception: {e}")
             messages.add_message(request,messages.WARNING,'خطا در دریافت اطلاعات کاربر')
             return redirect('/profilelist')
-        context = {'profile':profile}
+        context = {'profile':profile,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
         return  render(request,'vdiApp/profileinfo.html',context=context)
 
 @login_required(login_url='/accounts/login/')
