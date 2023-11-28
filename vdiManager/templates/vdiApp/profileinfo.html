@@ -35,6 +35,7 @@
     <h1>Server: {{profile.owner_server}} </h1>
     <h1>LDAP: {{profile.owner_create_by_ldap}} </h1>
     <h1>Activate: {{profile.owner_is_active}} </h1>
+    <h1>VNC Password: {{vd_vnc_pass}} </h1>
     <h1>توضیحات:{{profile.owner_description }}</h1>
     <h1>تاریخ ایجاد:{{profile.owner_created_at|to_jalali:'%Y/%m/%d'}}</h1>
     <h1>آخرین بروزرسانی:{{profile.owner_updated_at|to_jalali:'%Y/%m/%d'}}</h1>
@@ -47,6 +48,11 @@
                         حذف پروفایل
                     </button>
                 </a>
+                <a href="{{ vd_url }}" target="_blank">
+                  <button type="button" class="btn btn-info" >
+                      میزکار
+                  </button>
+              </a>
             </div>
         </div>
     </div>

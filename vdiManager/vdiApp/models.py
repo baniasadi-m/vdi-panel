@@ -5,7 +5,11 @@ from vdiManager.settings import Config
 # Create your models here.
 
 
-
+class VDIInfo(models.Model):
+    class Meta:
+        verbose_name = "مشخصات سامانه"
+    limit_user = models.IntegerField()
+    
 class VDIServer(models.Model):
     class Meta:
         verbose_name=" سرور "
