@@ -5,13 +5,20 @@
 <head>
 	<meta charset="utf-8">
 	<title>ورود</title>
-	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
-	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+	<link rel="shortcut icon" type="image/png" href="{% static 'vdi.png' %}"/>
+	<link rel="shortcut icon" type="image/png" href="{% static 'vdi.png' %}"/>
 	<link href="{% static 'assets/css/bootstrap-5.0.0-beta2.min.css' %}" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 </head>
 <style>
 	body {
-	  background-image: url("{% static 'assets/img/gonbad.jpg' %}");
+		margin: 0;
+		padding: 0;
+		background-image: url("{% static 'assets/img/vdi-blue.png' %}");
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-attachment: fixed;
+		width: 100%;
+      	height: 100%;
 	}
 
 	#id_captcha_1 {
@@ -28,7 +35,7 @@
 				<div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
 					<div class="text-center my-5">
 						
-						<img src="{% static 'assets/img/aqr.png' %}" alt="logo" width="100">
+						<img src="{% static 'assets/img/favicon2.ico' %}" alt="logo" width="100">
 					</div>
 					<div class="card shadow-lg">
 
@@ -58,10 +65,10 @@
 							</div>
 						</div> -->
 					</div>
-					<div class="text-center mt-5 text-muted">
+					<!-- <div class="text-center mt-5 text-muted">
 					تمام حقوق این وبگاه متعلق به آستان قدس رضوی است
 
-					</div>
+					</div> -->
 					{% if messages %}
 					<div class="row">
 					<div class="text-center mt-5 text-muted">
