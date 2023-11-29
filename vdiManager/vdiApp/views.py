@@ -398,12 +398,15 @@ def profile_info(request,info_id):
     if user_allowed(request,usergroup=['vdadmin']):
         try:
             profile = UserProfile.objects.get(owner_user=info_id)
-            vd = VirtualDesktop.objects.get(vd_owner= profile,vd_is_activate=True)
-
         except Exception as e:
             print(f"profile info exception: {e}")
-            messages.add_message(request,messages.WARNING,'خطا در دریافت اطلاعات کاربر')
+            messages.add_message(request,messages.WARNING,'خطا در دریافت اطلاعات کاربری')
             return redirect('/profilelist')
+        try:
+            vd = VirtualDesktop.objects.get(vd_owner= profile,vd_is_activate=True)
+        except VirtualDesktop.DoesNotExist:
+            vd = None
+        print(vd)
         context = {'profile':profile,'current_datetime': get_current_datetime(),'current_ip':f"{get_client_ip(request)}"}
         if vd != None:
             vd_url = f"{vd.vd_owner.owner_server.server_scheme}://{vd.vd_owner.owner_server.server_hostname}/{profile.owner_user}/"
