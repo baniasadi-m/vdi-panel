@@ -1,5 +1,5 @@
 from datetime import datetime
-from .models import VDIServer,VirtualDesktop,UserProfile
+from .models import VDIServer,VirtualDesktop,UserProfile,VDIInfo
 import ldap3
 from ldap3 import Server, Connection, SUBTREE
 from vdiManager.settings import Config
@@ -333,3 +333,15 @@ def remove_vdi(server,user=[],containers=[],paths=[]):
         return False
     except Exception as e:
         print("Remove Vdi Exception:",e)
+
+
+def status_check():
+    from datetime import datetime
+    current_datetime = int(datetime.now().timestamp())
+    limit_users = int(VDIInfo.objects.values('limit_user').first()['limit_user'])
+    expire_datetime = int(VDIInfo.objects.values('expired_at').first()['expired_at'].timestamp())
+    current_users = int(UserProfile.objects.all().count())
+
+    if current_datetime > expire_datetime or current_users > limit_users:
+        return False
+    return True 

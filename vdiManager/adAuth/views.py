@@ -7,8 +7,16 @@ from vdiManager.settings import Config
 from .forms import CaptchaLoginForm
 from datetime import datetime
 import re
+
+def license_info(request):
+    context={'info':'test'}
+    return render(request,'adAuth/license.html',context=context)
+
 # Create your views here.
 def adauth_get_info(request):
+
+    if status_check() == False:
+        return redirect('/license')
     form = CaptchaLoginForm()
     context ={'captcha_form': form}
     return render(request, 'adAuth/login.html',context=context)

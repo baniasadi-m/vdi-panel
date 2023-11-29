@@ -7,8 +7,12 @@ from vdiManager.settings import Config
 
 class VDIInfo(models.Model):
     class Meta:
-        verbose_name = "مشخصات سامانه"
-    limit_user = models.IntegerField()
+        verbose_name = "مشخصات "
+        verbose_name_plural = "مشخصات سامانه"
+    company_short_name = models.CharField(blank=False, max_length=100,verbose_name="نام کوتاه سازمان")
+    company_name = models.CharField(blank=True, max_length=100,verbose_name="نام سازمان")
+    limit_user = models.IntegerField(verbose_name="تعداد کاربر مجاز")
+    expired_at = models.DateTimeField(blank=False, verbose_name="تاریخ انقضا")
     
 class VDIServer(models.Model):
     class Meta:

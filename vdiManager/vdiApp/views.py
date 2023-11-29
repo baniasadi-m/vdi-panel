@@ -12,6 +12,9 @@ from .util import *
 # Main Dashboard
 @login_required(login_url='/accounts/login/')
 def dashboard(request):
+    if status_check() == False:
+        print(False)
+        return redirect('/license')
     from datetime import datetime, timedelta
     today_str = datetime.today().strftime("%Y-%m-%d")
     today_obj = datetime.strptime(today_str, "%Y-%m-%d")
@@ -41,6 +44,8 @@ def dashboard(request):
 # Creating vdi container
 @login_required(login_url='/accounts/login/')
 def vdcreate(request):
+    if status_check() == False:
+        return redirect('/license')
     if user_allowed(request,usergroup=['vdadmin']):
         if request.method == 'POST':
             form=CreateVirtualDesktop(request.POST)

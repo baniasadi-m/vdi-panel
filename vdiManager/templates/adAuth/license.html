@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>License Expired</title>
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'assets/css/expirebootstrap.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header bg-danger text-white">
+                    <h2>License Expired</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Your license has expired. Please contact support for renewal.</p>
+                    <!-- Add additional information or contact details if needed -->
+                </div>
+                <div class="card-footer text-muted">
+                    <p>&copy; 2023 Your Company Name. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="{% static 'assets/css/expire-jquery.js' %}"></script>
+<script src="{% static 'assets/css/expire-popper.js' %}"></script>
+<script src="{% static 'assets/css/expire-bootstrap.js' %}"></script>
+
+</body>
+</html>
