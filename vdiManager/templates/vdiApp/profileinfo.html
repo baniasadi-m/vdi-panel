@@ -2,8 +2,8 @@
 {% load static %}
 {% load jalali_tags %}
 {% block contentwraper %}
-<h1 class="m-0 text-dark">مشخصات پروفایل</h1>
-<hr>
+<!-- <h1 class="m-0 text-dark">مشخصات پروفایل</h1>
+<hr> -->
 {% endblock%}
 
 {% block maincontent %}
@@ -24,21 +24,170 @@
     </div>
   {% endif %}
 
-  
-    <h1 name="national_id">نام پروفایل:{{profile.owner_name }}</h1>
-    <hr>
-    <h1>User:{{profile.owner_user}}</h1>
-    <h1>Password:{{profile.owner_password }}</h1>
-    <h1>Container IP:{{profile.owner_ip }}</h1>
-    <h1>Fbrowser:{{profile.owner_browser_ip}}</h1>
-    <h1>Created Number: {{profile.owner_vd_created_number}}</h1>
-    <h1>Server: {{profile.owner_server}} </h1>
-    <h1>LDAP: {{profile.owner_create_by_ldap}} </h1>
-    <h1>Activate: {{profile.owner_is_active}} </h1>
-    <h1>VNC Password: {{vd_vnc_pass}} </h1>
-    <h1>توضیحات:{{profile.owner_description }}</h1>
-    <h1>تاریخ ایجاد:{{profile.owner_created_at|to_jalali:'%Y/%m/%d'}}</h1>
-    <h1>آخرین بروزرسانی:{{profile.owner_updated_at|to_jalali:'%Y/%m/%d'}}</h1>
+  <div class="panel-body center-screen">
+
+    <div class="col-md-6 inf-content">
+    <strong>مشخصات پروفایل</strong><br>
+    <div class="table-responsive">
+    <table class="table table-user-information">
+    <tbody>
+    <tr>
+    <td>
+    <strong>
+    <span class="glyphicon glyphicon-phone text-primary"></span>
+    نام
+    </strong>
+    </td>
+    <td class="text-primary">
+      {{profile.owner_name }}
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>
+    <span class="glyphicon glyphicon-link  text-primary"></span>
+    کاربری(username)
+    </strong>
+    </td>
+    <td class="text-primary">
+      {{profile.owner_user}}
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>
+    <span class="glyphicon glyphicon-cloud text-primary"></span>
+    رمز عبور
+    </strong>
+    </td>
+    <td class="text-primary">
+      {{profile.owner_password }}
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>
+    <span class="glyphicon glyphicon-link text-primary"></span>
+    آیپی میزکار
+    </strong>
+    </td>
+    <td class="text-primary">
+      {{profile.owner_ip }}
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>
+    <span class="glyphicon glyphicon-user  text-primary"></span>
+    آیپی مدیریت فایل
+    </strong>
+    </td>
+    <td class="text-primary">
+      {{profile.owner_browser_ip}}
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>
+    <span class="glyphicon glyphicon-lock text-primary"></span>
+    تعداد ساخته شده
+    </strong>
+    </td>
+    <td class="text-primary">
+      {{profile.owner_vd_created_number}}
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>
+    <span class="glyphicon glyphicon-calendar text-primary"></span>
+    سرور
+    </strong>
+    </td>
+    <td class="text-primary">
+      {{profile.owner_server}}
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>
+    <span class="glyphicon glyphicon-calendar text-primary"></span>
+    LDAP
+    </strong>
+    </td>
+    <td class="text-primary">
+      {%if profile.owner_create_by_ldap %}
+      <img src="{% static 'assets/img/icon-yes.svg' %}" alt="{{ cert.cert_is_activate }}">
+      {%else%}
+      <img src="{% static 'assets/img/icon-no.svg' %}" alt="{{ cert.cert_is_activate }}">
+      {%endif%}
+
+    </td>
+    </tr>
+    <tr>
+      <td>
+      <strong>
+      <span class="glyphicon glyphicon-calendar text-primary"></span>
+      فعال
+      </strong>
+      </td>
+      <td class="text-primary">
+        {%if profile.owner_is_active %}
+        <img src="{% static 'assets/img/icon-yes.svg' %}" alt="{{ cert.cert_is_activate }}">
+        {%else%}
+        <img src="{% static 'assets/img/icon-no.svg' %}" alt="{{ cert.cert_is_activate }}">
+        {%endif%}
+      
+      </td>
+      </tr>
+      <tr>
+        <td>
+        <strong>
+        <span class="glyphicon glyphicon-calendar text-primary"></span>
+        پسورد VNC
+        </strong>
+        </td>
+        <td class="text-primary" id="vncpass" onclick="copyText('vncpass')">
+          {{vd_vnc_pass}}
+        </td>
+        </tr>
+        <tr>
+          <td>
+          <strong>
+          <span class="glyphicon glyphicon-calendar text-primary"></span>
+          توضیحات
+          </strong>
+          </td>
+          <td class="text-primary">
+            {{profile.owner_description }}
+          </td>
+          </tr>
+          <tr>
+            <td>
+            <strong>
+            <span class="glyphicon glyphicon-calendar text-primary"></span>
+            تاریخ ایجاد
+            </strong>
+            </td>
+            <td class="text-primary">
+              {{profile.owner_created_at|to_jalali:'%Y/%m/%d'}}
+            </td>
+            </tr>
+            <tr>
+              <td>
+              <strong>
+              <span class="glyphicon glyphicon-calendar text-primary"></span>
+              آخرین بروزرسانی
+              </strong>
+              </td>
+              <td class="text-primary">
+                {{profile.owner_updated_at|to_jalali:'%Y/%m/%d'}}
+              </td>
+              </tr>
+    </tbody>
+    </table>
+    </div>
+    </div>
 
     <div class="container h-100">
         <div class="d-flex h-100">
@@ -57,5 +206,6 @@
         </div>
     </div>
 
+</div>
 </div>
     {% endblock %}

@@ -78,7 +78,7 @@ VDI URL
 VDI VNCPass
 </strong>
 </td>
-<td class="text-primary">
+<td class="text-primary" id="vncpass" onclick="copyText('vncpass')">
 {{vdi_vncpass}}
 </td>
 </tr>
@@ -101,7 +101,7 @@ File Manager
 File Manager User
 </strong>
 </td>
-<td class="text-primary">
+<td class="text-primary" id="fbuser" onclick="copyText('fbuser')">
 {{vdi_browser_user}}
 </td>
 </tr>
@@ -112,7 +112,7 @@ File Manager User
 File Manager Pass
 </strong>
 </td>
-<td class="text-primary">
+<td class="text-primary" id="fbpass" onclick="copyText('fbpass')">
 {{vdi_browser_pass}}
 </td>
 </tr>
@@ -146,8 +146,8 @@ VDI Expired
 </div>
 </div>
 <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
-<script type="text/javascript">
-	
+<script type="text/javascript">	
 </script>
+<script src="{% static 'assets/js/copytext.js'  %}" type="text/javascript"></script>
 </body>
 </html>
