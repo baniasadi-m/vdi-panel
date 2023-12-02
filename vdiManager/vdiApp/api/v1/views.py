@@ -201,16 +201,15 @@ def api_profiles(request,id=None):
         if id == None:
             return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
         mydata = request.data
-        profile = get_object_or_404(UserProfile, server_name=id)
-
-        serializer = ServerSerializer(instance=profile,data=mydata, partial=True)
+        profile = get_object_or_404(UserProfile, owner_user=id)
+        serializer = ProfileSerializer(instance=profile,data=mydata, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
     elif request.method == 'DELETE':
         if id == None:
             return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
-        vd = get_object_or_404(UserProfile, server_name=id)
+        vd = get_object_or_404(UserProfile, owner_user=id)
         serializer = ProfileSerializer(vd)
         vd.delete()
         return Response(serializer.data)
