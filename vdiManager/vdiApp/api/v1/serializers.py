@@ -2,11 +2,13 @@ from rest_framework import serializers
 from ...models import VirtualDesktop,VDIServer,UserProfile
 
 class VDISerializer(serializers.ModelSerializer):
-    server_ip = serializers.CharField(source='vd_server.server_ip',read_only=True)
     class Meta:
         model = VirtualDesktop
-        fields =['id','vd_container_name','vd_container_user','vd_container_password','vd_container_vncpass',
-        'vd_port','vd_browser_port','server_ip','vd_owner'
+        fields =['id','vd_container_name','vd_container_user'
+                 ,'vd_container_password','vd_browser_pass','vd_container_vncpass'
+                 ,'vd_owner','vd_creator_ip'
+                 ,'vd_is_activate','vd_created_by','vd_created_at','vd_revoked_at'
+                 ,'vd_expired_at'
         ]
 
 class ServerSerializer(serializers.ModelSerializer):
