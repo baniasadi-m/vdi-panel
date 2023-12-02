@@ -5,7 +5,7 @@ from .serializers import VDISerializer,VDIPostSerializer,ServerSerializer,Profil
 from ...models import VirtualDesktop,VDIServer,UserProfile
 from vdiManager.settings import Config
 from django.forms.models import model_to_dict
-from ...util import get_client_ip, get_server, jwt_gen_token
+from ...util import get_client_ip, get_server, jwt_gen_token, server_status
 
 from django.shortcuts import get_object_or_404
 
@@ -107,8 +107,8 @@ def api_vdesktops(request,id=None):
 
 
 @api_view(['GET','POST','DELETE','PUT'])
-def api_servers(request,id=None):
-    if request.method == 'GET' and id==None:
+def api_servers(request,server_name=None):
+    if request.method == 'GET' and server_name == None:
         try:
             vds = VDIServer.objects.all()
             serializer = ServerSerializer(vds,many=True)
@@ -116,12 +116,12 @@ def api_servers(request,id=None):
             return Response(serializer.data)
         except VirtualDesktop.DoesNotExist:
             return Response({"detaile":"Not Found"},status=status.HTTP_404_NOT_FOUND)
-    elif request.method == 'GET' and id != None:
-        vd = get_object_or_404(VDIServer, server_name=id)
+    elif request.method == 'GET' and server_name != None:
+        vd = get_object_or_404(VDIServer, server_name=server_name)
         serializer = ServerSerializer(vd)
         return Response(serializer.data)
     elif request.method == 'POST':
-        if id != None:
+        if server_name != None:
             return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
         mydata = request.data
         print(mydata)
@@ -131,25 +131,48 @@ def api_servers(request,id=None):
         return Response(serializer.data)
        
     elif request.method == 'PUT':
-        if id == None:
+        if server_name == None:
             return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
         mydata = request.data
-        server = get_object_or_404(VDIServer, server_name=id)
+        server = get_object_or_404(VDIServer, server_name=server_name)
 
         serializer = ServerSerializer(instance=server,data=mydata, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
     elif request.method == 'DELETE':
-        if id == None:
+        if server_name == None:
             return Response({"detaile":"Not Found"},status=status.HTTP_501_NOT_IMPLEMENTED)
-        vd = get_object_or_404(VDIServer, server_name=id)
+        vd = get_object_or_404(VDIServer, server_name=server_name)
         serializer = ServerSerializer(vd)
         vd.delete()
         return Response(serializer.data)
 
+@api_view(['GET','POST','DELETE','PUT'])
+def server_check(request,server_name=None):
+    if request.method == 'GET' and server_name == None:
+        try:
+            server = get_object_or_404(VDIServer, server_name=server_name)
+            url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/load"
+            output = {}
+            if server_status(server_url=url) == True:
+                output.update({
+                    'server' : server.server_name,
+                    'status' : 'Running'
 
+                })
+            else:
+                output.update({
+                    'server' : server.server_name,
+                    'status' : 'Failed'
 
+                })           
+                # serializer = ServerSerializer(server,many=True)
+                # print(get_client_ip(request))
+            return Response(output)
+        except VirtualDesktop.DoesNotExist:
+            return Response({"detaile":"Not Found"},status=status.HTTP_404_NOT_FOUND)
+ 
 
 @api_view(['GET','POST','DELETE','PUT'])
 def api_profiles(request,id=None):
