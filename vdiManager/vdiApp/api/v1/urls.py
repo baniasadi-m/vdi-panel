@@ -12,4 +12,5 @@ urlpatterns =[
     path('servers', api_servers, name='servers'),
     path('servers/<id>', api_servers, name='servers'),
     path('servers/<id>/check', server_check, name='servers'),
+    path('search/<q>', search, name='search'),
 ]
