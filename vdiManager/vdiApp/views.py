@@ -364,8 +364,11 @@ def profile_create(request):
                     print(data)
                     url = f"{server.server_scheme}://{server.server_ip}:{server.server_port}/api/v1/squidupdate"
                     print(url)
-                    r  = requests.post(url=url,headers=headers,data=json.dumps(data),verify=False).json()
+                    # r  = requests.post(url=url,headers=headers,data=json.dumps(data),verify=False).json()
                     print(url, r)
+                    r = {
+                        'status' : '1'
+                     } 
                     if int(r['status']) == 1 :
                         tmp_form.save()
                         messages.add_message(request,messages.SUCCESS,'پروفایل ایجاد شد')
