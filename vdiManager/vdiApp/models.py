@@ -11,6 +11,7 @@ class VDIInfo(models.Model):
         verbose_name_plural = "مشخصات سامانه"
     company_short_name = models.CharField(blank=False, max_length=100,verbose_name="نام کوتاه سازمان")
     company_name = models.CharField(blank=True, max_length=100,verbose_name="نام سازمان")
+    api_enabled = models.BooleanField(blank=True,default=False)
     limit_user = models.IntegerField(verbose_name="تعداد کاربر مجاز")
     expired_at = models.DateTimeField(blank=False, verbose_name="تاریخ انقضا")
     

@@ -5,12 +5,14 @@ from .serializers import VDISerializer,VDIPostSerializer,ServerSerializer,Profil
 from ...models import VirtualDesktop,VDIServer,UserProfile
 from vdiManager.settings import Config
 from django.forms.models import model_to_dict
-from ...util import get_client_ip, update_nginx, get_server, jwt_gen_token, server_status,create_container,gen_password, get_free_ip,get_profile_or_None,get_vd_or_None,get_expiry_time,profile_update_password,getUsersInGroup
+from ...util import api_check,get_client_ip, update_nginx, get_server, jwt_gen_token, server_status,create_container,gen_password, get_free_ip,get_profile_or_None,get_vd_or_None,get_expiry_time,profile_update_password,getUsersInGroup
 
 from django.shortcuts import get_object_or_404
 
 @api_view(['GET','POST','DELETE'])
 def api_vdesktops(request,id=None):
+    if api_check() == False:
+        return Response({"error":"Your License is Not Valid"},status=status.HTTP_401_UNAUTHORIZED)
     if request.method == 'GET' and id==None:
         try:
             vds = VirtualDesktop.objects.all()
@@ -276,6 +278,8 @@ def api_vdesktops(request,id=None):
 
 @api_view(['GET','POST','DELETE','PUT'])
 def api_servers(request,id=None):
+    if api_check() == False:
+        return Response({"error":"Your License is Not Valid"},status=status.HTTP_401_UNAUTHORIZED)
     if request.method == 'GET' and id == None:
         try:
             vds = VDIServer.objects.all()
@@ -318,6 +322,8 @@ def api_servers(request,id=None):
 
 @api_view(['GET','POST','DELETE','PUT'])
 def server_check(request,id=None):
+    if api_check() == False:
+        return Response({"error":"Your License is Not Valid"},status=status.HTTP_401_UNAUTHORIZED)
     if request.method == 'GET' and id == None:
         try:
             server = get_object_or_404(VDIServer, pk=id)
@@ -344,6 +350,8 @@ def server_check(request,id=None):
 
 @api_view(['GET','POST','DELETE','PUT'])
 def api_profiles(request,id=None):
+    if api_check() == False:
+        return Response({"error":"Your License is Not Valid"},status=status.HTTP_401_UNAUTHORIZED)
     if request.method == 'GET' and id==None:
         try:
             vds = UserProfile.objects.all()

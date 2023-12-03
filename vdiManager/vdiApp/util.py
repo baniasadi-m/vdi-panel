@@ -345,3 +345,14 @@ def status_check():
     if current_datetime > expire_datetime or current_users > limit_users:
         return False
     return True 
+def api_check():
+    from datetime import datetime
+    current_datetime = int(datetime.now().timestamp())
+    limit_users = int(VDIInfo.objects.values('limit_user').first()['limit_user'])
+    expire_datetime = int(VDIInfo.objects.values('expired_at').first()['expired_at'].timestamp())
+    current_users = int(UserProfile.objects.all().count())
+    api_enabled = VDIInfo.objects.values('api_enabled').first()['api_enabled']
+
+    if current_datetime > expire_datetime or current_users > limit_users or api_enabled != True:
+        return False
+    return True 
