@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from .serializers import VDISerializer,VDIPostSerializer,ServerSerializer,ProfileSerializer
 from ...models import VirtualDesktop,VDIServer,UserProfile
 from vdiManager.settings import Config
@@ -13,11 +14,14 @@ from django.shortcuts import get_object_or_404
 def api_vdesktops(request,id=None):
     if api_check() == False:
         return Response({"error":"Your License is Not Valid"},status=status.HTTP_401_UNAUTHORIZED)
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
     if request.method == 'GET' and id==None:
         try:
             vds = VirtualDesktop.objects.all()
             print(vds)
-            serializer = VDISerializer(vds,many=True)
+            result_page = paginator.paginate_queryset(vds, request)
+            serializer = VDISerializer(result_page,many=True)
             # print(get_client_ip(request))
             return Response(serializer.data)
         except VirtualDesktop.DoesNotExist:
@@ -283,7 +287,10 @@ def api_servers(request,id=None):
     if request.method == 'GET' and id == None:
         try:
             vds = VDIServer.objects.all()
-            serializer = ServerSerializer(vds,many=True)
+            paginator = PageNumberPagination()
+            paginator.page_size = 10
+            result_page = paginator.paginate_queryset(vds, request)
+            serializer = ServerSerializer(result_page,many=True)
             # print(get_client_ip(request))
             return Response(serializer.data)
         except VirtualDesktop.DoesNotExist:
@@ -355,7 +362,10 @@ def api_profiles(request,id=None):
     if request.method == 'GET' and id==None:
         try:
             vds = UserProfile.objects.all()
-            serializer = ProfileSerializer(vds,many=True)
+            paginator = PageNumberPagination()
+            paginator.page_size = 10
+            result_page = paginator.paginate_queryset(vds, request)
+            serializer = ProfileSerializer(result_page,many=True)
             return Response(serializer.data)
         except VirtualDesktop.DoesNotExist:
             return Response({"detaile":"Not Found"},status=status.HTTP_404_NOT_FOUND)
