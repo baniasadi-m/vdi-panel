@@ -337,14 +337,21 @@ def remove_vdi(server,user=[],containers=[],paths=[]):
 
 def status_check():
     from datetime import datetime
-    current_datetime = int(datetime.now().timestamp())
-    limit_users = int(VDIInfo.objects.values('limit_user').first()['limit_user'])
-    expire_datetime = int(VDIInfo.objects.values('expired_at').first()['expired_at'].timestamp())
-    current_users = int(UserProfile.objects.all().count())
-
-    if current_datetime > expire_datetime or current_users > limit_users:
+    try:
+        current_datetime = float(datetime.now().timestamp())
+        latest_check = float(VDIInfo.objects.values('latest_check').first()['latest_check'].timestamp())
+        limit_users = int(VDIInfo.objects.values('limit_user').first()['limit_user'])
+        expire_datetime = float(VDIInfo.objects.values('expired_at').first()['expired_at'].timestamp())
+        current_users = int(UserProfile.objects.all().count())
+        print(current_datetime,latest_check,abs(current_datetime - latest_check),current_datetime < latest_check)
+        if abs(current_datetime - latest_check) > 36000.000000 or current_datetime < latest_check:
+            return False
+        if current_datetime > expire_datetime or current_users > limit_users:
+            return False
+        return True 
+    except Exception as e:
+        print(e)
         return False
-    return True 
 def api_check():
     from datetime import datetime
     current_datetime = int(datetime.now().timestamp())

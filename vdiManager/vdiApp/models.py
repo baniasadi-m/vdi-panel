@@ -14,6 +14,15 @@ class VDIInfo(models.Model):
     api_enabled = models.BooleanField(blank=True,default=False)
     limit_user = models.IntegerField(verbose_name="تعداد کاربر مجاز")
     expired_at = models.DateTimeField(blank=False, verbose_name="تاریخ انقضا")
+    latest_check = models.DateTimeField(blank=False,auto_now_add=True,verbose_name='آخرین چک')
+    def save(self, *args, **kwargs):
+        # Check if there is already an existing instance
+        if not self.pk and VDIInfo.objects.exists():
+            # If there is, update the existing instance
+            existing_instance = VDIInfo.objects.first()
+            return existing_instance
+        # If there is no existing instance, proceed with normal save
+        super(VDIInfo, self).save(*args, **kwargs)
     
 class VDIServer(models.Model):
     class Meta:
