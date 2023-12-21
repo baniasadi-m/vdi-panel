@@ -1,5 +1,7 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,authentication_classes,permission_classes
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
@@ -12,6 +14,8 @@ from ...util import api_check,get_client_ip, update_nginx, get_server, jwt_gen_t
 from django.shortcuts import get_object_or_404
 
 @api_view(['GET','POST','DELETE'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 def api_vdesktops(request,id=None):
     if api_check() == False:
         return Response({"error":"Your License is Not Valid"},status=status.HTTP_401_UNAUTHORIZED)
@@ -203,6 +207,8 @@ def api_vdesktops(request,id=None):
         except VirtualDesktop.DoesNotExist:
             return Response({"detaile":"Not Found"},status=status.HTTP_504_GATEWAY_TIMEOUT)  
 
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['GET','POST','DELETE','PUT'])
 def api_servers(request,id=None):
     if api_check() == False:
@@ -250,6 +256,8 @@ def api_servers(request,id=None):
         vd.delete()
         return Response(serializer.data)
 
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['GET','POST','DELETE','PUT'])
 def server_check(request,id=None):
     if api_check() == False:
@@ -277,7 +285,8 @@ def server_check(request,id=None):
         except VirtualDesktop.DoesNotExist:
             return Response({"detaile":"Not Found"},status=status.HTTP_404_NOT_FOUND)
  
-
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['GET','POST','DELETE','PUT'])
 def api_profiles(request,id=None):
     if api_check() == False:
@@ -323,6 +332,8 @@ def api_profiles(request,id=None):
         vd.delete()
         return Response(serializer.data)
 
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def search(request,q):
     if api_check() == False:
