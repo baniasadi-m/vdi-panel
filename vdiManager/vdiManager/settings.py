@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'online_users',
     'rest_framework',
     'captcha',
+    'drf_yasg',
   
 ]
 ########  Captcha Config ###########
@@ -87,11 +88,11 @@ WSGI_APPLICATION = 'vdiManager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DB ={
-    "MYSQL_DB_NAME": environ.get("VDI_MYSQL_DB"),
-    "MYSQL_DB_USER":environ.get("VDI_MYSQL_USER"),
-    "MYSQL_DB_PASSWORD":environ.get("VDI_MYSQL_PASSWORD"),
-    "MYSQL_DB_HOST":environ.get("VDI_MYSQL_HOST"),
-    "MYSQL_DB_PORT":environ.get("VDI_MYSQL_PORT"),
+    "MYSQL_DB_NAME": environ.get("VDI_MYSQL_DB","panel"),
+    "MYSQL_DB_USER":environ.get("VDI_MYSQL_USER","panel"),
+    "MYSQL_DB_PASSWORD":environ.get("VDI_MYSQL_PASSWORD","panel"),
+    "MYSQL_DB_HOST":environ.get("VDI_MYSQL_HOST","172.17.0.2"),
+    "MYSQL_DB_PORT":environ.get("VDI_MYSQL_PORT","3306"),
 
 }
 DATABASES = {
@@ -134,7 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
 
